@@ -1,0 +1,9 @@
+[submodule "LH-API"]
+	path = LH-API
+	url = https://github.com/Legacy-Hosting/LH-API.git
+[submodule "LH-Agent"]
+	path = LH-Agent
+	url = https://github.com/Legacy-Hosting/LH-Agent.git
+[submodule "LH-Panel"]
+	path = LH-Panel
+	url = https://github.com/Legacy-Hosting/LH-Panel.git

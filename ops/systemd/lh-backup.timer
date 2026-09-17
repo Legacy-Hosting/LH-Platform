@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Legacy Hosting encrypted MySQL backup
+
+[Timer]
+OnCalendar=*-*-* 02:20:00 Europe/Oslo
+RandomizedDelaySec=20m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

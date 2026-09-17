@@ -1,0 +1,36 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "files": {
+    "includes": [
+      "LH-API/src/**",
+      "LH-API/tests/**",
+      "LH-Agent/src/**",
+      "LH-Agent/tests/**",
+      "LH-Panel/src/**",
+      "LH-Panel/tests/**",
+      "LH-Panel/playwright.config.js"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "correctness": {
+        "noUndeclaredVariables": "error",
+        "noUnreachable": "error",
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "error",
+        "useHookAtTopLevel": "error"
+      },
+      "security": {
+        "noGlobalEval": "error"
+      },
+      "suspicious": {
+        "noDoubleEquals": "error",
+        "noExplicitAny": "warn",
+        "noPrototypeBuiltins": "error",
+        "noUnsafeNegation": "error"
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_TOKEN || github.token }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.1
+          cache: pnpm
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            LH-API/pnpm-lock.yaml
+            LH-Agent/pnpm-lock.yaml
+            LH-Panel/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile && pnpm lint
+      - run: pnpm --dir LH-API install --frozen-lockfile
+      - run: pnpm --dir LH-Agent install --frozen-lockfile
+      - run: pnpm --dir LH-Panel install --frozen-lockfile
+      - run: pnpm --dir LH-API check:migrations && pnpm --dir LH-API test && pnpm --dir LH-Agent test
+      - run: pnpm --dir LH-Panel exec playwright install --with-deps chromium && pnpm --dir LH-Panel test:e2e
+      - run: pnpm --dir LH-API build && pnpm --dir LH-Agent build
+      - run: pnpm --dir LH-Panel build
+        env:
+          VITE_API_URL: https://api.legacyhosting.xyz/api/v1
+      - name: Assemble immutable release
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          ops/scripts/build-release.sh "$VERSION" "$PWD"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: legacy-hosting-${{ github.ref_name }}
+          path: |
+            legacy-hosting-*.tar.gz
+            legacy-hosting-*.tar.gz.sha256
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" legacy-hosting-*.tar.gz legacy-hosting-*.tar.gz.sha256 --verify-tag --generate-notes

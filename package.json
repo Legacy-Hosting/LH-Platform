@@ -1,0 +1,12 @@
+{
+  "name": "legacy-hosting-platform",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@12.4.1",
+  "scripts": {
+    "lint": "biome lint LH-API/src LH-API/tests LH-Agent/src LH-Agent/tests LH-Panel/src LH-Panel/tests LH-Panel/playwright.config.js"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14"
+  }
+}
