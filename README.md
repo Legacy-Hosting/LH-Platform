@@ -22,7 +22,7 @@ For en eksisterende klone:
 git submodule update --init --recursive
 ```
 
-Hvis komponent-repositories er private, må hovedrepoet ha en Actions-secret kalt `SUBMODULE_TOKEN` med read-only tilgang til `LH-API`, `LH-Agent` og `LH-Panel`.
+Private komponent-repositories krever en fine-grained read-only PAT i plattformrepoets Actions-secret `SUBMODULE_TOKEN`. Tokenen skal bare ha Contents: Read for `LH-API`, `LH-Agent` og `LH-Panel`.
 
 ## Lokal release-port
 

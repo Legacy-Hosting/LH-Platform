@@ -16,7 +16,7 @@
 
 For a local release candidate after all builds pass, run `ops/scripts/build-release.sh X.Y.Z`. The script uses the same archive layout as GitHub Actions.
 
-When publishing from the multi-repository workspace, push `LH-API`, `LH-Agent`, and `LH-Panel` branches and tags first. Then push the platform repository's updated submodule references. Private component repositories require the platform secret `SUBMODULE_TOKEN` with read-only repository access.
+When publishing from the multi-repository workspace, push `LH-API`, `LH-Agent`, and `LH-Panel` branches and tags first. Then push the platform repository's updated submodule references. Private components require the fine-grained read-only `SUBMODULE_TOKEN` documented in the root README.
 
 ## Rollback
 
