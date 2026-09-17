@@ -107,6 +107,7 @@ age_recipient=$(age-keygen -y "$age_temporary")
   write_value CLOUDFLARE_OAUTH_CLIENT_ID "$cloudflare_client_id"
   write_value CLOUDFLARE_OAUTH_CLIENT_SECRET "$cloudflare_client_secret"
   write_value CLOUDFLARE_OAUTH_REDIRECT_URI https://api.legacyhosting.xyz/api/v1/integrations/cloudflare/callback
+  write_value CLOUDFLARE_OAUTH_TOKEN_AUTH_METHOD client_secret_basic
   write_value CLOUDFLARE_OAUTH_SCOPES "dns.read dns.write zone.read user-details.read offline_access"
   write_value ACME_EMAIL angel@legacyhosting.xyz
   write_value CERTIFICATE_RENEWAL_DAYS 30
