@@ -12,12 +12,19 @@ if [[ ${ID} != "ubuntu" ]]; then
   exit 1
 fi
 
+ops_directory=$(cd "$(dirname "$0")/.." && pwd)
+logrotate_source="$ops_directory/logrotate/legacy-hosting"
+if [[ ! -f "$logrotate_source" ]]; then
+  echo "Missing bundled logrotate policy: $logrotate_source" >&2
+  exit 1
+fi
+
 apt-get update
-apt-get install -y nginx mysql-client ca-certificates curl age logrotate
+DEBIAN_FRONTEND=noninteractive apt-get install -y nginx mysql-client ca-certificates curl age logrotate
 install -d -m 0755 /opt/legacy-hosting/releases /opt/legacy-hosting/incoming
 install -d -m 0700 /etc/legacy-hosting /var/backups/legacy-hosting/mysql
 install -d -m 0755 /var/www
-install -m 0644 "$(dirname "$0")/../logrotate/legacy-hosting" /etc/logrotate.d/legacy-hosting
+install -m 0644 "$logrotate_source" /etc/logrotate.d/legacy-hosting
 systemctl enable --now nginx
 
 echo "Server directories and operating-system dependencies are ready."
