@@ -73,7 +73,7 @@ Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TE
 
 **Status: `FINISHED`**
 
-- [x] Registrering av noder med offentlig IP, privat IP og ønsket CNAME-mål.
+- [x] Registrering av noder med offentlig/privat FQDN, separate IPv4- og IPv6-adresser og ønsket CNAME-mål.
 - [x] Agent-token og signerte kommandoer mellom API og node.
 - [x] Opprette, starte, stoppe, restarte og slette PM2-applikasjoner.
 - [x] Lagringssti følger `/home/ROOT.DOMAIN/FULL.HOSTNAME`.
