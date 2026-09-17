@@ -22,10 +22,12 @@ required_paths=(
   LH-API/database
   LH-API/package.json
   LH-API/pnpm-lock.yaml
+  LH-API/pnpm-workspace.yaml
   LH-API/ecosystem.config.cjs
   LH-Agent/dist
   LH-Agent/package.json
   LH-Agent/pnpm-lock.yaml
+  LH-Agent/pnpm-workspace.yaml
   LH-Agent/ecosystem.config.cjs
   LH-Panel/dist/index.html
   ops
@@ -43,8 +45,8 @@ release_name="legacy-hosting-$version"
 release_root="$temporary_directory/$release_name"
 mkdir -p "$release_root/LH-API" "$release_root/LH-Agent" "$release_root/LH-Panel" "$release_root/ops"
 
-cp -a "$repository_root"/LH-API/{dist,database,package.json,pnpm-lock.yaml,ecosystem.config.cjs,.env.example,README.md,SERVER.md} "$release_root/LH-API/"
-cp -a "$repository_root"/LH-Agent/{dist,package.json,pnpm-lock.yaml,ecosystem.config.cjs,.env.example,README.md} "$release_root/LH-Agent/"
+cp -a "$repository_root"/LH-API/{dist,database,package.json,pnpm-lock.yaml,pnpm-workspace.yaml,ecosystem.config.cjs,.env.example,README.md,SERVER.md} "$release_root/LH-API/"
+cp -a "$repository_root"/LH-Agent/{dist,package.json,pnpm-lock.yaml,pnpm-workspace.yaml,ecosystem.config.cjs,.env.example,README.md} "$release_root/LH-Agent/"
 cp -a "$repository_root/LH-Panel/dist" "$repository_root/LH-Panel/package.json" "$release_root/LH-Panel/"
 cp -a "$repository_root/ops/." "$release_root/ops/"
 cp "$repository_root"/{ROADMAP.md,SECURITY.md,RELEASE.md,BACKUP.md} "$release_root/"
