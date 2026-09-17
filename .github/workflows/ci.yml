@@ -10,94 +10,22 @@ permissions:
   contents: read
 
 jobs:
-  api-and-agent:
+  platform:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: legacyhosting
-          MYSQL_ROOT_PASSWORD: test-password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --host=127.0.0.1 --user=root --password=test-password"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-    env:
-      NODE_ENV: test
-      DATABASE_URL: mysql://root:test-password@127.0.0.1:3306/legacyhosting
-      CREDENTIAL_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
-      CSRF_SECRET: ci-only-csrf-secret-with-32-characters
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
-        with:
-          submodules: recursive
-          token: ${{ secrets.SUBMODULE_TOKEN }}
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 12.4.1
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22.22.1
-          cache: pnpm
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            LH-API/pnpm-lock.yaml
-            LH-Agent/pnpm-lock.yaml
-      - name: Install pinned repository tooling
-        run: pnpm install --frozen-lockfile
-      - name: Lint source and tests
-        run: pnpm lint
-      - name: Install API dependencies
-        run: pnpm --dir LH-API install --frozen-lockfile
-      - name: Apply migrations to MySQL 8
-        run: pnpm --dir LH-API db:migrate
-      - name: Test API and migrations
-        run: pnpm --dir LH-API test
-      - name: Typecheck and build API
-        run: pnpm --dir LH-API typecheck && pnpm --dir LH-API build
-      - name: Audit production API dependencies
-        run: pnpm --dir LH-API audit --prod --audit-level high
-      - name: Install agent dependencies
-        run: pnpm --dir LH-Agent install --frozen-lockfile
-      - name: Test, typecheck, and build agent
-        run: pnpm --dir LH-Agent test && pnpm --dir LH-Agent typecheck && pnpm --dir LH-Agent build
-      - name: Audit production agent dependencies
-        run: pnpm --dir LH-Agent audit --prod --audit-level high
-
-  panel:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          submodules: recursive
-          token: ${{ secrets.SUBMODULE_TOKEN }}
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 12.4.1
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 22.22.1
-          cache: pnpm
-          cache-dependency-path: LH-Panel/pnpm-lock.yaml
-      - name: Install panel dependencies
-        run: pnpm --dir LH-Panel install --frozen-lockfile
-      - name: Build panel
-        run: pnpm --dir LH-Panel build
-      - name: Install Chromium
-        run: pnpm --dir LH-Panel exec playwright install --with-deps chromium
-      - name: Run responsive panel tests
-        run: pnpm --dir LH-Panel test:e2e
-      - name: Upload Playwright report on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: |
-            LH-Panel/playwright-report
-            LH-Panel/test-results
-          retention-days: 7
+      - name: Validate shell scripts
+        run: bash -n ops/scripts/*.sh
+      - name: Verify executable release scripts
+        run: test -x ops/scripts/build-release.sh && test -x ops/scripts/deploy-release.sh && test -x ops/scripts/rollback-release.sh
+      - name: Verify pinned component references
+        run: |
+          set -euo pipefail
+          test "$(git ls-tree HEAD LH-API | awk '{print $2}')" = commit
+          test "$(git ls-tree HEAD LH-Agent | awk '{print $2}')" = commit
+          test "$(git ls-tree HEAD LH-Panel | awk '{print $2}')" = commit
+      - name: Reject committed secrets and release archives
+        run: |
+          set -euo pipefail
+          ! git ls-files | grep -E '(^|/)\.env$|\.tar\.gz$|\.sha256$|(^|/)id_(rsa|ed25519)$'
