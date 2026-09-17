@@ -50,6 +50,14 @@ cp -a "$repository_root/ops/." "$release_root/ops/"
 cp "$repository_root"/{ROADMAP.md,SECURITY.md,RELEASE.md,BACKUP.md} "$release_root/"
 chmod 0755 "$release_root"/ops/scripts/*.sh
 
+{
+  printf 'version=%s\n' "$version"
+  printf 'platform_commit=%s\n' "$(git -C "$repository_root" rev-parse HEAD)"
+  printf 'api_commit=%s\n' "$(git -C "$repository_root/LH-API" rev-parse HEAD)"
+  printf 'agent_commit=%s\n' "$(git -C "$repository_root/LH-Agent" rev-parse HEAD)"
+  printf 'panel_commit=%s\n' "$(git -C "$repository_root/LH-Panel" rev-parse HEAD)"
+} > "$release_root/RELEASE-MANIFEST.txt"
+
 archive="$output_directory/$release_name.tar.gz"
 checksum="$archive.sha256"
 tar -C "$temporary_directory" -czf "$archive" "$release_name"

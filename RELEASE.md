@@ -13,6 +13,8 @@
 
 For a local release candidate after all builds pass, run `ops/scripts/build-release.sh X.Y.Z`. The script uses the same archive layout as GitHub Actions.
 
+When publishing from the multi-repository workspace, push `LH-API`, `LH-Agent`, and `LH-Panel` branches and tags first. Then push the platform repository's updated submodule references. Private component repositories require the platform secret `SUBMODULE_TOKEN` with read-only repository access.
+
 ## Rollback
 
 Run `ops/scripts/rollback-release.sh VERSION`. Releases use additive, forward-compatible migrations; application rollback never reverses database migrations automatically. Restore a database only for confirmed data corruption and follow `BACKUP.md`.
