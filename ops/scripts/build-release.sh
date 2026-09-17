@@ -54,6 +54,11 @@ cp -a "$repository_root/ops/." "$release_root/ops/"
 cp "$repository_root"/{ROADMAP.md,SECURITY.md,RELEASE.md,BACKUP.md} "$release_root/"
 chmod 0755 "$release_root"/ops/scripts/*.sh
 
+mkdir -p "$release_root/artifacts"
+tar -C "$release_root/LH-Agent" -czf "$release_root/artifacts/lh-agent-runtime.tar.gz" \
+  dist package.json pnpm-lock.yaml pnpm-workspace.yaml ecosystem.config.cjs
+(cd "$release_root/artifacts" && sha256sum lh-agent-runtime.tar.gz > lh-agent-runtime.tar.gz.sha256)
+
 {
   printf 'version=%s\n' "$version"
   printf 'platform_commit=%s\n' "$(git -C "$repository_root" rev-parse HEAD)"

@@ -10,7 +10,7 @@
 6. Run `ops/scripts/validate-production-env.sh /etc/legacy-hosting/api.env /etc/legacy-hosting/agent.env api-only`, then create an encrypted database backup.
 7. Run `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`. The first deployment starts API and panel without an unenrolled agent.
 8. Register the initial Windows Hello account with the protected bootstrap token, then remove the bootstrap-token file and `INITIAL_ADMIN_TOKEN` from `api.env`.
-9. Create the node in the panel, run `configure-agent.sh` interactively with its one-time credentials, and run `activate-agent.sh`.
+9. Create the node in the panel and run its **Auto deploy** command on the intended Ubuntu server. `configure-agent.sh` plus `activate-agent.sh` remains the manual fallback.
 10. Verify API health, PM2 state, panel HTTPS, WebAuthn login, one health check, and one signed agent heartbeat.
 11. Set `ALLOW_LEGACY_AGENT_SIGNATURES=false` after all agents are on v1.
 

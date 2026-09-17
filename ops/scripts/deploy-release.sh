@@ -28,7 +28,7 @@ fi
 staging=$(mktemp -d "$base/releases/.staging-${version}.XXXXXX")
 trap 'rm -rf -- "$staging"' EXIT
 tar -xzf "$archive" --no-same-owner --strip-components=1 -C "$staging"
-for path in LH-API/package.json LH-API/dist/server.js LH-Agent/dist/index.js LH-Panel/dist/index.html; do
+for path in LH-API/package.json LH-API/dist/server.js LH-Agent/dist/index.js LH-Panel/dist/index.html artifacts/lh-agent-runtime.tar.gz artifacts/lh-agent-runtime.tar.gz.sha256 ops/scripts/install-node-agent.sh; do
   if [[ ! -e "$staging/$path" ]]; then
     echo "Release is missing $path" >&2
     exit 1
