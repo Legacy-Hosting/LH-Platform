@@ -22,7 +22,7 @@ Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TE
 | 6 | DNS, reverse proxy og TLS | `FINISHED` |
 | 7 | Drift, logger og sanntidsoppdateringer | `FINISHED` |
 | 8 | Overvåking, varsling og ressursgrenser | `FINISHED` |
-| 9 | Produksjonsherding og lansering | `STARTED` |
+| 9 | Produksjonsherding og lansering | `FINISHED` |
 | 10 | Billing og fremtidige API-produkter | `PLANNED` |
 
 ## Fase 1 — Designsystem og responsivt panelskall
@@ -80,6 +80,9 @@ Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TE
 - [x] Miljøvariabler lagres kryptert og brukes ved oppstart/deployment.
 - [x] Automatisk oppdagelse av npm, pnpm, yarn, bun og vanlige Node.js-rammeverk.
 - [x] Internt styrt port og generering av PM2-konfigurasjon.
+- [x] Flere PM2-prosesser per repository med web-, API-, worker- og custom-prosesser.
+- [x] Transaksjonell, kollisjonssikker auto-tildeling av porter; kunder kan ikke velge eller overstyre `PORT`.
+- [x] Prosesspesifikke arbeidsmapper, kommandoer, miljøvariabler, startrekkefølge og persistente filer/mapper.
 - [x] Deployment-historikk og rollback til tidligere commit.
 
 ## Fase 6 — DNS, reverse proxy og TLS
@@ -88,6 +91,7 @@ Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TE
 
 - [x] Opprette og oppdatere Cloudflare CNAME for applikasjonsdomener.
 - [x] Generere Nginx reverse-proxy-konfigurasjon per applikasjon.
+- [x] Path-basert ruting av flere prosesser på samme hostname og valgfrie hostnames/aliaser på tvers av tilkoblede Cloudflare-soner.
 - [x] TLS-utstedelse med Certbot og Cloudflare DNS-01.
 - [x] Midlertidig credential-fil for Cloudflare-token under sertifikatutstedelse.
 - [x] Automatisk sertifikatfornyelse.
@@ -117,21 +121,20 @@ Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TE
 - [x] Automatisk deteksjon og recovery-varsling når en node eller applikasjon går ned.
 - [x] CPU-, minne-, lagrings- og månedlige trafikkgrenser med workspace-standard og applikasjonsoverstyring.
 - [x] Panel-, Resend-e-post- og signerte webhook-varsler med konfigurerbare regler og cooldown.
+- [x] Nodeadministrasjon og nodeovervåking er skjult og API-beskyttet for kunder, men tilgjengelig i eget plattformadmin-område.
 
 ## Fase 9 — Produksjonsherding og lansering
 
-**Status: `STARTED`**
+**Status: `FINISHED`**
 
 - [x] Fullføre enhets-, integrasjons- og ende-til-ende-tester.
 - [x] Legge til CI for lint, test, build og migrasjonskontroll.
 - [x] Gjennomgå rate limiting, CSRF, replay-beskyttelse og nøkkelrotasjon.
 - [x] Definere backup, restore-test, loggretention og beredskapsrutiner.
 - [x] Lage repeterbar installasjon, oppdatering og rollback for API, panel og agent.
-- [ ] Produksjonskonfigurere GitHub App, Cloudflare OAuth og alle secrets.
-- [ ] Staged utrulling til `ams3.web-01.legacyh.fyi` og verifikasjon mot Managed MySQL 8.
-- [ ] Produksjonsgodkjenning, dokumentasjon og første versjonerte release.
-
-Produksjonsdelen avventer bekreftelse av serverens nye SSH-fingeravtrykk og at produksjonshemmelighetene legges direkte på serveren.
+- [x] Produksjonskonfigurere GitHub App, Cloudflare OAuth og alle secrets.
+- [x] Staged utrulling til `ams3.web-01.legacyh.fyi` og verifikasjon mot Managed MySQL 8.
+- [x] Produksjonsgodkjenning, dokumentasjon og første versjonerte release.
 
 ## Fase 10 — Billing og fremtidige API-produkter
 
@@ -145,4 +148,4 @@ Produksjonsdelen avventer bekreftelse av serverens nye SSH-fingeravtrykk og at p
 
 ## Neste anbefalte arbeid
 
-Fullfør fase 9 med verifisert SSH-tilkobling, produksjonssecrets, staged utrulling og produksjonsgodkjenning før fase 10 startes.
+Start fase 10 med planer, kvoter og billing uten å blande faktureringslogikk inn i panelmodulene.
