@@ -63,9 +63,16 @@ BACKUP_ENV_FILE=/etc/legacy-hosting/backup.env "$staging/ops/scripts/backup-mysq
 
 mv "$staging" "$release"
 trap - EXIT
-previous=$(readlink -f "$base/current" 2>/dev/null || true)
-if [[ -n $previous && $previous == "$base/releases/"* ]]; then
-  ln -sfn "$previous" "$base/previous"
+previous=
+if [[ -L "$base/current" ]]; then
+  current_target=$(readlink -f "$base/current" 2>/dev/null || true)
+  if [[ -n $current_target && $current_target == "$base/releases/"* && -d $current_target ]]; then
+    previous=$current_target
+    ln -sfn "$previous" "$base/previous"
+  fi
+elif [[ -e "$base/current" ]]; then
+  echo "$base/current must be a release symlink" >&2
+  exit 1
 fi
 ln -sfn "$release" "$base/current"
 ln -sfn "$base/current/LH-Panel/dist" /var/www/legacy-hosting-panel
@@ -86,7 +93,8 @@ if [[ $agent_enabled == true ]]; then
   pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
 fi
 pm2 save
-curl --fail --silent --show-error --retry 10 --retry-delay 2 http://127.0.0.1:8080/health | grep -q '"status":"ok"'
+curl --fail --silent --show-error --retry 10 --retry-delay 2 --retry-connrefused \
+  http://127.0.0.1:8080/health | grep -q '"status":"ok"'
 
 install -m 0644 "$release/ops/nginx/api.legacyhosting.xyz.conf" /etc/nginx/sites-available/api.legacyhosting.xyz.conf
 install -m 0644 "$release/ops/nginx/panel.legacyhosting.xyz.conf" /etc/nginx/sites-available/panel.legacyhosting.xyz.conf
