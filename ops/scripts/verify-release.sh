@@ -14,5 +14,23 @@ if [[ -f /etc/legacy-hosting/agent.env ]]; then
 else
   echo "Agent enrollment is pending; API/panel stage only."
 fi
+current_release=$(readlink -f "$base/current")
+CURRENT_RELEASE="$current_release" node <<'NODE'
+const { execFileSync } = require("node:child_process");
+
+const currentRelease = process.env.CURRENT_RELEASE;
+const processes = JSON.parse(execFileSync("pm2", ["jlist"], { encoding: "utf8" }));
+const required = ["lh-api", "lh-certificate-worker", "lh-monitoring-worker"];
+if (require("node:fs").existsSync("/etc/legacy-hosting/agent.env")) {
+  required.push("lh-agent");
+}
+for (const name of required) {
+  const processInfo = processes.find((item) => item.name === name);
+  const scriptPath = processInfo?.pm2_env?.pm_exec_path;
+  if (!scriptPath?.startsWith(`${currentRelease}/`)) {
+    throw new Error(`${name} is not running from ${currentRelease}`);
+  }
+}
+NODE
 nginx -t
 echo "Release verification passed for $(cat "$base/current-release")."

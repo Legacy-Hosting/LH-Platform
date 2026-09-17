@@ -80,16 +80,20 @@ rollback_on_error() {
   if [[ -n $previous && -d $previous ]]; then
     ln -sfn "$previous" "$base/current"
     ln -sfn "$base/current/LH-Panel/dist" /var/www/legacy-hosting-panel
-    pm2 startOrReload "$base/current/LH-API/ecosystem.config.cjs" --update-env || true
+    pm2 delete lh-api lh-certificate-worker lh-monitoring-worker >/dev/null 2>&1 || true
+    pm2 start "$base/current/LH-API/ecosystem.config.cjs" --update-env || true
     if [[ -f /etc/legacy-hosting/agent.env ]]; then
-      pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env || true
+      pm2 delete lh-agent >/dev/null 2>&1 || true
+      pm2 start "$base/current/LH-Agent/ecosystem.config.cjs" --update-env || true
     fi
   fi
 }
 trap rollback_on_error ERR
-pm2 startOrReload "$base/current/LH-API/ecosystem.config.cjs" --update-env
+pm2 delete lh-api lh-certificate-worker lh-monitoring-worker >/dev/null 2>&1 || true
+pm2 start "$base/current/LH-API/ecosystem.config.cjs" --update-env
 if [[ $agent_enabled == true ]]; then
-  pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
+  pm2 delete lh-agent >/dev/null 2>&1 || true
+  pm2 start "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
 fi
 pm2 save
 curl --fail --silent --show-error --retry 10 --retry-delay 2 --retry-connrefused \
