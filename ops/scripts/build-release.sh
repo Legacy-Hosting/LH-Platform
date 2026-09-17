@@ -39,6 +39,8 @@ for path in "${required_paths[@]}"; do
   fi
 done
 
+VITE_APP_VERSION="$version" pnpm --dir "$repository_root/LH-Panel" build
+
 temporary_directory=$(mktemp -d)
 trap 'rm -rf -- "$temporary_directory"' EXIT
 release_name="legacy-hosting-$version"
