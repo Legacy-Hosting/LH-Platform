@@ -31,7 +31,7 @@ set -a
 set +a
 
 required_api=(
-  NODE_ENV PANEL_ORIGIN DATABASE_URL SESSION_COOKIE_DOMAIN WEBAUTHN_RP_ID
+  NODE_ENV PANEL_ORIGIN DATABASE_URL DATABASE_SSL_CA SESSION_COOKIE_DOMAIN WEBAUTHN_RP_ID
   WEBAUTHN_ORIGIN CREDENTIAL_ENCRYPTION_KEY CSRF_SECRET
   CLOUDFLARE_OAUTH_CLIENT_ID CLOUDFLARE_OAUTH_CLIENT_SECRET CLOUDFLARE_OAUTH_REDIRECT_URI
   GITHUB_APP_ID GITHUB_APP_SLUG GITHUB_CLIENT_ID GITHUB_CLIENT_SECRET
@@ -43,6 +43,10 @@ for name in "${required_api[@]}"; do
     exit 1
   fi
 done
+if [[ ! -r $DATABASE_SSL_CA ]]; then
+  echo "Cannot read API database CA certificate: $DATABASE_SSL_CA" >&2
+  exit 1
+fi
 if [[ $NODE_ENV != "production" || $PANEL_ORIGIN != https://* || $WEBAUTHN_ORIGIN != https://* ]]; then
   echo "Production mode and HTTPS panel/WebAuthn origins are required" >&2
   exit 1

@@ -41,6 +41,10 @@ write_value() {
 }
 
 read_required "DigitalOcean Managed MySQL DATABASE_URL" database_url true
+if [[ $database_url != mysql://* || $database_url == *show-password* ]]; then
+  echo "DATABASE_URL must be a complete mysql:// URL containing the real password" >&2
+  exit 1
+fi
 read_required "Cloudflare OAuth client ID" cloudflare_client_id
 read_required "Cloudflare OAuth client secret" cloudflare_client_secret true
 read_required "GitHub App ID" github_app_id
@@ -87,6 +91,7 @@ age_recipient=$(age-keygen -y "$age_temporary")
   write_value TRUST_PROXY true
   write_value PANEL_ORIGIN https://panel.legacyhosting.xyz
   write_value DATABASE_URL "$database_url"
+  write_value DATABASE_SSL_CA "$db_ssl_ca"
   write_value SESSION_COOKIE_DOMAIN .legacyhosting.xyz
   write_value SESSION_TTL_DAYS 30
   write_value WEBAUTHN_RP_NAME "Legacy Hosting"
