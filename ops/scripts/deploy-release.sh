@@ -35,9 +35,27 @@ for path in LH-API/package.json LH-API/dist/server.js LH-Agent/dist/index.js LH-
   fi
 done
 
-"$staging/ops/scripts/validate-production-env.sh"
+agent_enabled=false
+if [[ -f /etc/legacy-hosting/agent.env ]]; then
+  agent_enabled=true
+  "$staging/ops/scripts/validate-production-env.sh"
+elif [[ -L "$base/current" ]]; then
+  echo "Existing installations require /etc/legacy-hosting/agent.env" >&2
+  exit 1
+else
+  "$staging/ops/scripts/validate-production-env.sh" /etc/legacy-hosting/api.env /etc/legacy-hosting/agent.env api-only
+  echo "Initial API/panel deployment will continue without the agent."
+fi
+for certificate in api.legacyhosting.xyz panel.legacyhosting.xyz; do
+  if [[ ! -r "/etc/letsencrypt/live/$certificate/fullchain.pem" || ! -r "/etc/letsencrypt/live/$certificate/privkey.pem" ]]; then
+    echo "Missing TLS certificate for $certificate" >&2
+    exit 1
+  fi
+done
 ln -s /etc/legacy-hosting/api.env "$staging/LH-API/.env"
-ln -s /etc/legacy-hosting/agent.env "$staging/LH-Agent/.env"
+if [[ $agent_enabled == true ]]; then
+  ln -s /etc/legacy-hosting/agent.env "$staging/LH-Agent/.env"
+fi
 pnpm --dir "$staging/LH-API" install --prod --frozen-lockfile
 pnpm --dir "$staging/LH-Agent" install --prod --frozen-lockfile
 BACKUP_ENV_FILE=/etc/legacy-hosting/backup.env "$staging/ops/scripts/backup-mysql.sh"
@@ -57,14 +75,30 @@ rollback_on_error() {
     ln -sfn "$previous" "$base/current"
     ln -sfn "$base/current/LH-Panel/dist" /var/www/legacy-hosting-panel
     pm2 startOrReload "$base/current/LH-API/ecosystem.config.cjs" --update-env || true
-    pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env || true
+    if [[ -f /etc/legacy-hosting/agent.env ]]; then
+      pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env || true
+    fi
   fi
 }
 trap rollback_on_error ERR
 pm2 startOrReload "$base/current/LH-API/ecosystem.config.cjs" --update-env
-pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
+if [[ $agent_enabled == true ]]; then
+  pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
+fi
 pm2 save
 curl --fail --silent --show-error --retry 10 --retry-delay 2 http://127.0.0.1:8080/health | grep -q '"status":"ok"'
+
+install -m 0644 "$release/ops/nginx/api.legacyhosting.xyz.conf" /etc/nginx/sites-available/api.legacyhosting.xyz.conf
+install -m 0644 "$release/ops/nginx/panel.legacyhosting.xyz.conf" /etc/nginx/sites-available/panel.legacyhosting.xyz.conf
+ln -sfn /etc/nginx/sites-available/api.legacyhosting.xyz.conf /etc/nginx/sites-enabled/api.legacyhosting.xyz.conf
+ln -sfn /etc/nginx/sites-available/panel.legacyhosting.xyz.conf /etc/nginx/sites-enabled/panel.legacyhosting.xyz.conf
+nginx -t
+systemctl reload nginx
+
+install -m 0644 "$release/ops/systemd/lh-backup.service" /etc/systemd/system/lh-backup.service
+install -m 0644 "$release/ops/systemd/lh-backup.timer" /etc/systemd/system/lh-backup.timer
+systemctl daemon-reload
+systemctl enable --now lh-backup.timer
 trap - ERR
 
 printf '%s\n' "$version" > "$base/current-release"

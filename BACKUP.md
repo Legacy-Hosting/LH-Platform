@@ -2,6 +2,8 @@
 
 DigitalOcean Managed MySQL automated backups and point-in-time recovery are the primary database recovery layer. A daily encrypted logical export provides an independent recovery path.
 
+`configure-production.sh` generates the age identity and writes the protected backup environment without exposing passwords in shell history.
+
 ## Logical backup
 
 Configure `/etc/legacy-hosting/backup.env` with mode `0600`. Use a read-only backup user where possible and set an `age` recipient. Run `ops/scripts/backup-mysql.sh` daily from systemd or cron. The script writes only encrypted `.sql.gz.age` files and SHA-256 checksums under `/var/backups/legacy-hosting/mysql`.

@@ -6,10 +6,13 @@
 2. Create an annotated `vX.Y.Z` tag. The release workflow creates a checksummed immutable archive.
 3. Verify the server SSH host fingerprint through the DigitalOcean console before accepting a changed key.
 4. Copy the archive and checksum to `/opt/legacy-hosting/incoming`.
-5. Run `ops/scripts/validate-production-env.sh` and create an encrypted database backup.
-6. Run `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`.
-7. Verify API health, PM2 state, panel HTTPS, WebAuthn login, one health check, and one signed agent heartbeat.
-8. Set `ALLOW_LEGACY_AGENT_SIGNATURES=false` after all agents are on v1.
+5. On the first installation, run `ops/scripts/configure-production.sh` interactively on the server. Never paste secrets into chat or commit them.
+6. Run `ops/scripts/validate-production-env.sh /etc/legacy-hosting/api.env /etc/legacy-hosting/agent.env api-only`, then create an encrypted database backup.
+7. Run `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`. The first deployment starts API and panel without an unenrolled agent.
+8. Register the initial Windows Hello account with the protected bootstrap token, then remove the bootstrap-token file and `INITIAL_ADMIN_TOKEN` from `api.env`.
+9. Create the node in the panel, run `configure-agent.sh` interactively with its one-time credentials, and run `activate-agent.sh`.
+10. Verify API health, PM2 state, panel HTTPS, WebAuthn login, one health check, and one signed agent heartbeat.
+11. Set `ALLOW_LEGACY_AGENT_SIGNATURES=false` after all agents are on v1.
 
 For a local release candidate after all builds pass, run `ops/scripts/build-release.sh X.Y.Z`. The script uses the same archive layout as GitHub Actions.
 

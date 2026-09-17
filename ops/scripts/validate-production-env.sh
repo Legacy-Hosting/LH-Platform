@@ -3,8 +3,18 @@ set -Eeuo pipefail
 
 api_env=${1:-/etc/legacy-hosting/api.env}
 agent_env=${2:-/etc/legacy-hosting/agent.env}
+validation_mode=${3:-full}
 
-for file in "$api_env" "$agent_env"; do
+if [[ $validation_mode != "full" && $validation_mode != "api-only" ]]; then
+  echo "Validation mode must be full or api-only" >&2
+  exit 1
+fi
+
+files=("$api_env")
+if [[ $validation_mode == "full" ]]; then
+  files+=("$agent_env")
+fi
+for file in "${files[@]}"; do
   if [[ ! -f "$file" ]]; then
     echo "Missing protected environment file: $file" >&2
     exit 1
@@ -47,19 +57,21 @@ if [[ $decoded_key_bytes -ne 32 ]]; then
   exit 1
 fi
 
-unset LH_API_URL LH_NODE_ID LH_AGENT_TOKEN
-set -a
-. "$agent_env"
-set +a
-for name in LH_API_URL LH_NODE_ID LH_AGENT_TOKEN; do
-  if [[ -z ${!name:-} ]]; then
-    echo "Missing agent setting: $name" >&2
+if [[ $validation_mode == "full" ]]; then
+  unset LH_API_URL LH_NODE_ID LH_AGENT_TOKEN
+  set -a
+  . "$agent_env"
+  set +a
+  for name in LH_API_URL LH_NODE_ID LH_AGENT_TOKEN; do
+    if [[ -z ${!name:-} ]]; then
+      echo "Missing agent setting: $name" >&2
+      exit 1
+    fi
+  done
+  if [[ $LH_API_URL != https://* || ${#LH_AGENT_TOKEN} -lt 32 ]]; then
+    echo "The agent requires an HTTPS API URL and a strong node token" >&2
     exit 1
   fi
-done
-if [[ $LH_API_URL != https://* || ${#LH_AGENT_TOKEN} -lt 32 ]]; then
-  echo "The agent requires an HTTPS API URL and a strong node token" >&2
-  exit 1
 fi
 
 echo "Production environment validation passed without printing secret values."

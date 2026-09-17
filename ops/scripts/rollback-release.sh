@@ -18,7 +18,10 @@ fi
 ln -sfn "$target" "$base/current"
 ln -sfn "$base/current/LH-Panel/dist" /var/www/legacy-hosting-panel
 pm2 startOrReload "$base/current/LH-API/ecosystem.config.cjs" --update-env
-pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
+if [[ -f /etc/legacy-hosting/agent.env ]]; then
+  ln -sfn /etc/legacy-hosting/agent.env "$base/current/LH-Agent/.env"
+  pm2 startOrReload "$base/current/LH-Agent/ecosystem.config.cjs" --update-env
+fi
 pm2 save
 curl --fail --silent --show-error --retry 10 --retry-delay 2 http://127.0.0.1:8080/health | grep -q '"status":"ok"'
 printf '%s\n' "$1" > "$base/current-release"
