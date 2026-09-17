@@ -39,12 +39,9 @@ agent_enabled=false
 if [[ -f /etc/legacy-hosting/agent.env ]]; then
   agent_enabled=true
   "$staging/ops/scripts/validate-production-env.sh"
-elif [[ -L "$base/current" ]]; then
-  echo "Existing installations require /etc/legacy-hosting/agent.env" >&2
-  exit 1
 else
   "$staging/ops/scripts/validate-production-env.sh" /etc/legacy-hosting/api.env /etc/legacy-hosting/agent.env api-only
-  echo "Initial API/panel deployment will continue without the agent."
+  echo "API/panel deployment will continue without the pending agent enrollment."
 fi
 for certificate in api.legacyhosting.xyz panel.legacyhosting.xyz; do
   if [[ ! -r "/etc/letsencrypt/live/$certificate/fullchain.pem" || ! -r "/etc/letsencrypt/live/$certificate/privkey.pem" ]]; then
