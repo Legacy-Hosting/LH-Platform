@@ -27,7 +27,7 @@ if [[ -e "$release" ]]; then
 fi
 staging=$(mktemp -d "$base/releases/.staging-${version}.XXXXXX")
 trap 'rm -rf -- "$staging"' EXIT
-tar -xzf "$archive" --strip-components=1 -C "$staging"
+tar -xzf "$archive" --no-same-owner --strip-components=1 -C "$staging"
 for path in LH-API/package.json LH-API/dist/server.js LH-Agent/dist/index.js LH-Panel/dist/index.html; do
   if [[ ! -e "$staging/$path" ]]; then
     echo "Release is missing $path" >&2
@@ -61,6 +61,8 @@ pnpm --dir "$staging/LH-Agent" install --prod --frozen-lockfile
 BACKUP_ENV_FILE=/etc/legacy-hosting/backup.env "$staging/ops/scripts/backup-mysql.sh"
 (cd "$staging/LH-API" && node dist/core/database/migrate.js)
 
+chown -R root:root "$staging"
+chmod 0755 "$staging"
 mv "$staging" "$release"
 trap - EXIT
 previous=
