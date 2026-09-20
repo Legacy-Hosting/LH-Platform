@@ -39,6 +39,8 @@ for path in "${required_paths[@]}"; do
   fi
 done
 
+pnpm --dir "$repository_root/LH-API" build
+pnpm --dir "$repository_root/LH-Agent" build
 VITE_APP_VERSION="$version" pnpm --dir "$repository_root/LH-Panel" build
 
 temporary_directory=$(mktemp -d)
