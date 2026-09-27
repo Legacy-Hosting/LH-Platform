@@ -143,11 +143,18 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Gjenåpne GitHub-hostede Actions-runners ved å rette organisasjonens
   betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
-- [ ] Verifisere og tagge API `1.2.1` (`2e8beb3`) og SSO `1.3.1`
-  (`252a9fd`). Begge er verifisert lokalt mot MySQL 8, men de eksakte
+- [ ] Verifisere og tagge API `1.2.1` (`dbe91ac`) og SSO `1.3.1`
+  (`f329467`). Begge er verifisert lokalt mot MySQL 8 og som signerte
+  releasebygg, men de eksakte
   committene kan ikke tagges før Actions-betalingsblokkeringen er fjernet og CI
   er grønn.
-- [ ] Signere releaseartefakter i tillegg til SHA-256.
+- [x] Implementere fail-closed Ed25519-signering i alle tjenesteworkflows,
+  separat `SIGNATURES`-struktur, fingerprint-kontrollert nøkkelprovisionering og
+  signaturverifisering før utpakking eller Agent-promotering.
+- [ ] Generere én produksjonsnøkkel per tjeneste på en betrodd operatørmaskin,
+  lagre kryptert offline recovery-kopi, konfigurere
+  `RELEASE_SIGNING_PRIVATE_KEY_B64`, provisionere de offentlige nøklene og
+  publisere første signerte patchrelease.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
 

@@ -12,10 +12,14 @@ LH-Releases/
     lh-api-X.Y.Z.tar.gz
     SHA256/
       lh-api-X.Y.Z.tar.gz.sha256
+    SIGNATURES/
+      lh-api-X.Y.Z.tar.gz.sig
   LH-Agent/
     lh-agent-X.Y.Z.tar.gz
     SHA256/
       lh-agent-X.Y.Z.tar.gz.sha256
+    SIGNATURES/
+      lh-agent-X.Y.Z.tar.gz.sig
   LH-Discord/
   LH-Hub/
   LH-Panel/
@@ -23,7 +27,10 @@ LH-Releases/
   LH-Status/
 ```
 
-`.tar.gz` lagres med Git LFS. `.tar.gz.sha256` lagres som vanlig tekst. Publiserte versjoner er append-only og må aldri overskrives. Hvis en release er feil, publiseres en ny versjon.
+`.tar.gz` lagres med Git LFS, `.tar.gz.sha256` som vanlig tekst og den
+64-byte Ed25519-signaturen `.tar.gz.sig` som en liten binær Git-fil. Alle tre
+er append-only og må aldri overskrives. Hvis en release er feil, publiseres en
+ny versjon.
 
 ## Gjeldende produksjonskandidater
 
@@ -38,7 +45,9 @@ LH-Releases/
 | LH-Status | `0.4.0` |
 
 Alle ligger som verifiserte LFS-arkiver i `LH-Releases`, med separat checksum
-under tjenestens `SHA256`-mappe.
+under tjenestens `SHA256`-mappe. Disse historiske kandidatene ble publisert før
+signeringskravet og skal erstattes av nye signerte patchreleaser før utrulling
+på de nye serverne.
 
 ## Tilgang til LH-Releases
 
@@ -47,6 +56,12 @@ Hvert tjenesterepository bruker Actions-secret `RELEASES_TOKEN` med minst mulig 
 - Contents: Read and write kun for `Legacy-Hosting/LH-Releases`.
 - Ingen administrasjons-, secrets-, workflow- eller organisasjonstilgang.
 - Tokenet må ha utløpsdato og dokumentert eier.
+
+Hvert repository bruker i tillegg sin egen
+`RELEASE_SIGNING_PRIVATE_KEY_B64`. Nøkkelen er Ed25519, skal bare være
+tilgjengelig for release-workflowen og skal ha en kryptert offline recovery-kopi
+utenfor GitHub og produksjon. Bare den offentlige nøkkelen og kontrollert
+SHA-256-fingerprint provisioneres med `LH-Ops/scripts/install-release-verifier.sh`.
 
 Skrivbare deploy keys er for øyeblikket deaktivert av organisasjonspolicyen. Ikke bruk et bredt personlig `repo`-token som snarvei. Frem til en repository-avgrenset fine-grained token er konfigurert, bygger og verifiserer release-workflowen hele releasen og laster opp tjenestemappen som et Actions-artifact med syv dagers retention. Kryss-repository-publisering hoppes eksplisitt over.
 
@@ -63,6 +78,8 @@ Før en tag opprettes:
 5. Release-scriptet skal ha bestått shell-syntakskontroll.
 6. Databaseendringer skal være additive og bakoverkompatible med forrige applikasjonsrelease.
 7. Ingen `.env`, tokens, private nøkler, database-CA eller kundedata skal ligge i arkivet.
+8. Tjenestens signeringssecret, offentlige nøkkel og kontrollerte fingerprint
+   skal være på plass; unsigned release skal feile lukket.
 
 Endringer i connection pools, databaseindekser, proxy/cache, runtime eller
 kritiske leseflyter krever i tillegg den bounded smoke-/kapasitetsprosedyren i
@@ -86,23 +103,30 @@ smoke-profilen; metningstest kjøres mot produksjonslik staging.
 3. Commit og push til `main`.
 4. Vent til CI er grønn.
 5. Opprett annotert tag `vX.Y.Z` på den verifiserte committen og push taggen.
-6. Release-workflowen bygger på nytt og committer arkiv/checksum til riktig mappe i `LH-Releases`.
-7. Kontroller at arkivet er et LFS-objekt og at checksum-filen peker på riktig filnavn.
-8. Verifiser lokalt med:
+6. Release-workflowen bygger på nytt og committer arkiv, checksum og signatur til riktig mappe i `LH-Releases`.
+7. Kontroller at arkivet er et LFS-objekt, at checksum-filen peker på riktig filnavn og at signaturen er 64 byte.
+8. Verifiser lokalt med den uavhengig provisionerte offentlige nøkkelen:
 
 ```bash
-cd LH-Releases/LH-API
-sha256sum --check SHA256/lh-api-X.Y.Z.tar.gz.sha256
+LH-Ops/scripts/verify-release-artifact.sh \
+  /etc/legacy-hosting/release-keys/lh-api.pub \
+  LH-Releases/LH-API/lh-api-X.Y.Z.tar.gz \
+  LH-Releases/LH-API/SHA256/lh-api-X.Y.Z.tar.gz.sha256 \
+  LH-Releases/LH-API/SIGNATURES/lh-api-X.Y.Z.tar.gz.sig
 ```
 
 Hvis `RELEASES_TOKEN` mangler, publiseres det verifiserte artifactet kontrollert fra en ren lokal checkout:
 
 ```bash
 git -C LH-Releases pull --ff-only origin main
-LH-API/ops/scripts/build-release.sh X.Y.Z LH-Releases
-cd LH-Releases/LH-API
-sha256sum --check SHA256/lh-api-X.Y.Z.tar.gz.sha256
-cd ..
+RELEASE_SIGNING_PRIVATE_KEY_FILE=/secure/operator/path/lh-api-release-private.pem \
+  LH-API/ops/scripts/build-release.sh X.Y.Z LH-Releases
+LH-Ops/scripts/verify-release-artifact.sh \
+  /secure/operator/path/lh-api-release.pub \
+  LH-Releases/LH-API/lh-api-X.Y.Z.tar.gz \
+  LH-Releases/LH-API/SHA256/lh-api-X.Y.Z.tar.gz.sha256 \
+  LH-Releases/LH-API/SIGNATURES/lh-api-X.Y.Z.tar.gz.sig
+cd LH-Releases
 git lfs install --local
 git add LH-API
 git commit -m "release: LH-API X.Y.Z"
@@ -129,13 +153,13 @@ Origin-DNS skal være DNS-only, mens offentlige CNAME-er kan være proxied. Clou
 ## Utrulling
 
 Følg den ordnede runbooken i `LH-Ops/docs/production-rollout.md`. Hver tjeneste
-har nå sitt eget checksum-verifiserende `deploy-release.sh`,
+har nå sitt eget checksum- og signaturverifiserende `deploy-release.sh`,
 `verify-release.sh` og `rollback-release.sh`. Utrulling gjøres én tjeneste om
 gangen:
 
 1. Kjør LH-Ops host-audit og utbedre alle feil.
-2. Last ned arkiv og checksum fra `LH-Releases`.
-3. Kjør tjenestens `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`.
+2. Last ned arkiv, checksum og signatur fra `LH-Releases`.
+3. Kjør tjenestens `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM SIGNATURE VERSION`.
 4. Kjør tjenestens `ops/scripts/verify-release.sh`.
 5. Verifiser ekstern HTTPS, Cloudflare og én kritisk brukerflyt.
 6. Kontroller Agent-heartbeat og Hub/Status før neste tjeneste flyttes.
@@ -147,7 +171,7 @@ scoped, en backup har fullført remote readback, og staging av samme arkiv er
 verifisert uten å endre live-data. Privat `age` identity skal ikke ligge fast på
 hostingnoden.
 
-Deploy-skriptene eier SHA-256-kontroll, versjonert utpakking, låste
+Deploy-skriptene eier SHA-256- og Ed25519-kontroll, versjonert utpakking, låste
 produksjonsavhengigheter, beskyttede miljøfiler, atomisk `current`-symlink,
 PM2/Nginx og lokal health verification. API og SSO nekter å migrere før den
 krypterte backupjobben er installert.

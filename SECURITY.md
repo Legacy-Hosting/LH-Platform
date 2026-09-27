@@ -103,10 +103,16 @@ Agentkommandoer skal fortsatt bindes til node, timestamp, nonce, body og credent
 ## Release- og forsyningskjedesikkerhet
 
 - CI bruker låste avhengigheter og dependency audit.
-- Releases bygges på verifisert tag, publiseres append-only og kontrolleres med SHA-256.
+- Releases bygges på verifisert tag og publiseres append-only med SHA-256 og en
+  separat Ed25519-signatur per tjeneste. Deploy verifiserer mot en offentlig
+  nøkkel provisionert utenfor arkivet før utpakking.
+- Private release-nøkler skal bare ligge i tjenestens Actions-secret og kryptert
+  offline recovery. En tjenestenøkkel skal ikke kunne signere en annen
+  tjenestes release.
 - GitHub Actions-permissions settes eksplisitt til minste nødvendige tilgang.
 - Tredjepartsactions skal versjonspinnes og Dependabot-PR-er gjennomgås før merge.
-- Langsiktig mål er signering og provenance/attestasjon i tillegg til checksum.
+- Langsiktig mål etter signering er verifiserbar build-provenance/attestasjon
+  uten å eksponere metadata fra private repositories i en offentlig logg.
 
 ## Hendelseshåndtering og rotasjon
 
