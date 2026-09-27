@@ -37,6 +37,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Opprette sentral release-struktur med egen `SHA256`-mappe per tjeneste.
 - [x] Opprette `LH-Ops` for felles infrastruktur, topologi, backup og restore-drills.
 - [x] Etablere Node.js 24 LTS som runtime-baseline.
+- [x] Lage Ubuntu 26.04-bootstrap for checksum-verifisert Node 24.21.0, pnpm 12.4.1, PM2 7.0.4 og signert DigitalOcean Metrics Agent.
 - [x] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
 - [x] Fjerne den gamle samlede release- og CI-flyten fra `LH-Platform`.
 - [ ] Fjerne de siste submodule-referansene når migreringsrepoet arkiveres.
