@@ -54,6 +54,9 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Flere prosesser per applikasjon, inkludert web, API, worker, custom og bot.
 - [x] Live buildlogger, runtime-logger, kopiering og automatisk loggscrolling.
 - [x] Live statusoppdatering ved deploy, restart og stopp.
+- [x] La API-readiness returnere HTTP 503 med `degraded` når databasen ikke er
+  tilgjengelig, slik at proxy og overvåking ikke behandler en ubrukelig instans
+  som frisk.
 - [x] Redigering og sletting av applikasjoner.
 - [x] Supportvisning av kundens workspace med eksplisitt retur til egen administratorkontekst.
 - [x] Skjule nodeinfrastruktur fra vanlige kunder.
@@ -80,6 +83,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Konfigurere produksjonsklienter, secrets og callback-URL-er på de nye serverne.
 - [ ] Migrere eksisterende Panel-brukere, identiteter og aktive sesjoner kontrollert.
 - [x] Bruke Secure, HttpOnly, SameSite og host-only SSO-cookies uten delt domene-cookie.
+- [x] Tidsbegrense og samle samtidige SSO-readiness-prober til én MySQL-spørring
+  for å unngå connection-storm ved databasefeil.
 - [x] Legge til RP-initiated logout og signert back-channel session revocation på tvers av SSO, API, Panel og Hub.
 - [ ] Fjerne gammel API-innlogging først etter parallell drift og godkjent rollback-test.
 
@@ -138,6 +143,10 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Gjenåpne GitHub-hostede Actions-runners ved å rette organisasjonens
   betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
+- [ ] Verifisere og tagge API `1.2.1` (`2e8beb3`) og SSO `1.3.1`
+  (`252a9fd`). Begge er verifisert lokalt mot MySQL 8, men de eksakte
+  committene kan ikke tagges før Actions-betalingsblokkeringen er fjernet og CI
+  er grønn.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
@@ -177,13 +186,15 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 ## Rekkefølge videre
 
-1. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
-2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
-3. Aktiver Hub OIDC-klienten og de ferdige server-side observability-integrasjonene i produksjon.
-4. Konfigurer VAPID-nøkler og produksjonsverifiser incidents, vedlikehold og Web Push fra FRA1.
-5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
-6. Kjør backup-, restore-, failover- og sikkerhetstest.
-7. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
+1. Rett GitHub Actions-betaling/spending limit, kjør CI på nytt og publiser de
+   ventende API- og SSO-patchreleaseene.
+2. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
+3. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
+4. Aktiver Hub OIDC-klienten og de ferdige server-side observability-integrasjonene i produksjon.
+5. Konfigurer VAPID-nøkler og produksjonsverifiser incidents, vedlikehold og Web Push fra FRA1.
+6. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
+7. Kjør backup-, restore-, failover- og sikkerhetstest.
+8. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
 
 ## Sjekkliste før LH-Platform slettes
 
