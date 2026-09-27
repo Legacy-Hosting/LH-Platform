@@ -37,7 +37,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Opprette sentral release-struktur med egen `SHA256`-mappe per tjeneste.
 - [x] Opprette `LH-Ops` for felles infrastruktur, topologi, backup og restore-drills.
 - [x] Etablere Node.js 24 LTS som runtime-baseline.
-- [x] Lage Ubuntu 26.04-bootstrap for checksum-verifisert Node 24.21.0, pnpm 12.4.1, PM2 7.0.4 og signert DigitalOcean Metrics Agent.
+- [x] Lage Ubuntu 26.04-bootstrap for checksum-verifisert Node 24.21.0, pnpm 12.4.1, PM2 7.0.4, Certbot, 2 GiB swap og signert DigitalOcean Metrics Agent.
+- [x] Lage felles skrivebeskyttet host-audit, trygg førstegangsutstedelse av sertifikat og en ordnet produksjonsrunbook i `LH-Ops`.
 - [x] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
 - [x] Fjerne den gamle samlede release- og CI-flyten fra `LH-Platform`.
 - [ ] Fjerne de siste submodule-referansene når migreringsrepoet arkiveres.
@@ -118,6 +119,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Rolleoppslag basert på immutable Discord role IDs, ikke rollenavn.
 - [x] Synkronisere kun staff-rollene Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
 - [x] Hindre customer-, product-, notification-, booster-, bot-, member- og muted-roller fra å gi Hub-tilgang.
+- [x] Lage checksum-verifisert Discord-deploy, readiness etter Discord-innlogging, health verification og automatisk rollback.
 - [ ] Koble Discord-identitet til SSO-konto med eksplisitt brukerflyt.
 - [ ] Legge til retry-kø og audit-logg for mislykket synkronisering.
 - [ ] Produksjonssette boten på Panel-serveren.
@@ -130,12 +132,12 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Separate release-workflows som publiserer med credential, eller beholder et verifisert 7-dagers Actions-artifact for manuell publisering når credential mangler.
 - [x] Git LFS for `.tar.gz`; checksum-filer ligger som vanlig tekst under `SHA256`.
 - [x] Legge CI- og release-workflows til Hub og Status.
-- [ ] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
+- [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere første separate release for SSO (`1.2.0`) og Hub (`0.2.0`).
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.35`, Panel `1.0.35`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.1`, Hub `0.2.1` og Status `0.1.1`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
-- [ ] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
+- [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
 
 ## Fase 8 – Backup, observability og kapasitet
 

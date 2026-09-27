@@ -25,6 +25,21 @@ LH-Releases/
 
 `.tar.gz` lagres med Git LFS. `.tar.gz.sha256` lagres som vanlig tekst. Publiserte versjoner er append-only og må aldri overskrives. Hvis en release er feil, publiseres en ny versjon.
 
+## Gjeldende produksjonskandidater
+
+| Tjeneste | Versjon |
+| --- | --- |
+| LH-API | `1.0.35` |
+| LH-Panel | `1.0.35` |
+| LH-Agent | `1.0.32` |
+| LH-Discord | `1.1.0` |
+| LH-SSO | `1.2.1` |
+| LH-Hub | `0.2.1` |
+| LH-Status | `0.1.1` |
+
+Alle ligger som verifiserte LFS-arkiver i `LH-Releases`, med separat checksum
+under tjenestens `SHA256`-mappe.
+
 ## Tilgang til LH-Releases
 
 Hvert tjenesterepository bruker Actions-secret `RELEASES_TOKEN` med minst mulig tilgang:
@@ -108,19 +123,22 @@ Origin-DNS skal være DNS-only, mens offentlige CNAME-er kan være proxied. Clou
 
 ## Utrulling
 
-Inntil alle repositories har ferdige deploy-skript, gjøres produksjonsutrulling kontrollert og én tjeneste om gangen:
+Følg den ordnede runbooken i `LH-Ops/docs/production-rollout.md`. Hver tjeneste
+har nå sitt eget checksum-verifiserende `deploy-release.sh`,
+`verify-release.sh` og `rollback-release.sh`. Utrulling gjøres én tjeneste om
+gangen:
 
-1. Last ned arkiv og checksum fra `LH-Releases`.
-2. Verifiser SHA-256 før utpakking.
-3. Pakk ut til en ny versjonert mappe under `/opt/legacy-hosting/<service>/releases/X.Y.Z`.
-4. Installer kun låste produksjonsavhengigheter.
-5. Koble inn tjenestens beskyttede miljøfil fra `/etc/legacy-hosting/<service>.env`.
-6. For API/SSO: ta backup, kjør migrasjoner, og verifiser migreringsledger før prosessen byttes.
-7. Bytt en atomisk `current`-symlink.
-8. Reload riktig PM2-prosess eller Nginx-konfigurasjon.
-9. Verifiser lokalt health-endepunkt før ekstern trafikk godtas.
-10. Verifiser ekstern HTTPS, Cloudflare og én kritisk brukerflyt.
-11. Kontroller Agent-heartbeat og Hub/Status etter utrullingen.
+1. Kjør LH-Ops host-audit og utbedre alle feil.
+2. Last ned arkiv og checksum fra `LH-Releases`.
+3. Kjør tjenestens `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`.
+4. Kjør tjenestens `ops/scripts/verify-release.sh`.
+5. Verifiser ekstern HTTPS, Cloudflare og én kritisk brukerflyt.
+6. Kontroller Agent-heartbeat og Hub/Status før neste tjeneste flyttes.
+
+Deploy-skriptene eier SHA-256-kontroll, versjonert utpakking, låste
+produksjonsavhengigheter, beskyttede miljøfiler, atomisk `current`-symlink,
+PM2/Nginx og lokal health verification. API og SSO nekter å migrere før den
+krypterte backupjobben er installert.
 
 Panel er en statisk build og skal serveres direkte av Nginx. API, SSO, Hub-backend og Discord kjører som separate prosesser. `LH-Agent` kjører i `monitor-only` på kontrollplanserverne og i `hosting-node` kun på servere som kan utføre kundedeployments.
 
