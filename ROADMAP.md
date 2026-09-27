@@ -71,7 +71,9 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Etablere en tidsbegrenset engangsbillett-bro fra eksisterende Panel-login til SSO-interaksjoner.
 - [x] La autentiserte Panel-sesjoner fullføre SSO-interaksjoner med samme immutable bruker-UUID, uten å eksponere brotokenet i nettleseren.
 - [x] Implementere Authorization Code + PKCE callback som BFF i LH-API og opprette eksisterende HttpOnly Panel-sesjon etter validert ID-token.
-- [ ] Flytte passkeys/WebAuthn og kontogjenoppretting til SSO.
+- [x] Implementere SSO-eid passkey-innlogging med same-origin WebAuthn, generiske autentiseringsfeil og rollback-bryter.
+- [x] Lage idempotent dry-run/apply-migrering av aktive legacy-passkeys med RP-ID-, identitets- og credential-kollisjonskontroll.
+- [ ] Produksjonsmigrere passkeys/WebAuthn og flytte kontogjenoppretting til SSO.
 - [x] Støtte statisk allowlistede OIDC-klienter og separate resource-audiences for Panel, Hub og API.
 - [ ] Konfigurere produksjonsklienter, secrets og callback-URL-er på de nye serverne.
 - [ ] Migrere eksisterende Panel-brukere, identiteter og aktive sesjoner kontrollert.
