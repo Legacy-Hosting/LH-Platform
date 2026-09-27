@@ -11,3 +11,12 @@
 *.sha256
 .DS_Store
 Thumbs.db
+
+# Independent repositories that temporarily share this workspace root.
+/LH-Discord/
+/LH-Hub/
+/LH-Ops/
+/LH-Releases/
+/LH-SSO/
+/LH-Status/
+/TEMPLATE/

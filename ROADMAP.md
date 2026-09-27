@@ -23,6 +23,7 @@ Denne rotmappen er et midlertidig migreringsområde. Hver tjeneste eies, testes,
 | `LH-Discord` | Discord-integrasjon og synkronisering av staff-roller | Samme server som `LH-Panel`, egen PM2-prosess | `READY` |
 | `LH-Agent` | Overvåking på alle servere og hostingkommandoer på applikasjonsnoder | Alle relevante servere | `READY` |
 | `LH-Releases` | Immutable releasearkiver og SHA-256-filer | GitHub/LFS, ikke en kjørende tjeneste | `READY` |
+| `LH-Ops` | Felles infrastruktur, serverbootstrap, backup og restore-drills | Privat driftsrepository, ikke en kjørende tjeneste | `READY` |
 | `LH-Platform` | Gammel samlet orkestrering | Skal ikke deployes videre | `STARTED` utfasing |
 
 API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` for å unngå at én regionfeil skjuler driftsstatus. Managed MySQL ligger i AMS3. Bare API og SSO skal ha databasetilgang.
@@ -34,6 +35,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Opprette `LH-Agent`, `LH-API`, `LH-Discord`, `LH-Hub`, `LH-Panel`, `LH-Releases`, `LH-SSO` og `LH-Status`.
 - [x] Flytte aktiv API-, Panel- og Agent-kode til egne repositories.
 - [x] Opprette sentral release-struktur med egen `SHA256`-mappe per tjeneste.
+- [x] Opprette `LH-Ops` for felles infrastruktur, topologi, backup og restore-drills.
 - [x] Etablere Node.js 24 LTS som runtime-baseline.
 - [ ] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
 - [ ] Fjerne submodule-avhengigheter og den gamle samlede releaseflyten.
