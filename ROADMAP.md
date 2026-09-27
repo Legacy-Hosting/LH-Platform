@@ -108,7 +108,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Lagre status atomisk lokalt og levere siste snapshot via Nginx- og nettleserfallback.
 - [ ] Produksjonssette probe-tjenesten på FRA1 og verifisere fallback under et simulert AMS3-avbrudd.
 - [x] Publisere hendelser og planlagt vedlikehold i det atomiske fallback-snapshotet uten interne detaljer.
-- [ ] Støtte incidenthistorikk, abonnementsvarsler og RSS/Atom.
+- [x] Støtte incidenthistorikk og offentlig Atom-feed fra samme validerte snapshot.
+- [ ] Legge til abonnementsvarsler for statusendringer.
 - [ ] Etablere egen varslingsvei som ikke er avhengig av systemet den overvåker.
 
 ## Fase 6 – Discord og rollemodell
@@ -134,7 +135,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.36`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.2`, Hub `0.4.0` og Status `0.2.0`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.36`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.2`, Hub `0.4.0` og Status `0.3.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
