@@ -35,6 +35,9 @@ SSO er autoritativ for staff-tilgang. Discord er bare en provisioneringskilde:
 - Tillatte staff-roller er Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
 - Customer-, Premium Customer-, Partner-, produkt-, varslings-, booster-, bot-, member- og muted-roller gir aldri Hub-tilgang.
 - En Discord-rolle får først effekt når Discord-identiteten er eksplisitt koblet til riktig SSO-bruker.
+- `/lh-link` synkroniserer først aktive staff-roller og utsteder deretter en ti minutters engangsbillett over den VPC-beskyttede servicekontrakten.
+- Koblingsbilletten lagres kun som SHA-256, holdes i URL-fragmentet for å unngå HTTP-/referrer-logger, og kan bare fullføres med en eksisterende SSO-passkey med påkrevd user verification.
+- Discord-ID og SSO-konto bindes én-til-én; displaynavn og e-post brukes aldri som automatisk koblingsgrunnlag.
 
 ## Tjeneste-til-tjeneste-sikkerhet
 

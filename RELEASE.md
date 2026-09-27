@@ -32,8 +32,8 @@ LH-Releases/
 | LH-API | `1.2.0` |
 | LH-Panel | `1.0.38` |
 | LH-Agent | `1.0.32` |
-| LH-Discord | `1.2.0` |
-| LH-SSO | `1.2.2` |
+| LH-Discord | `1.3.0` |
+| LH-SSO | `1.3.0` |
 | LH-Hub | `0.6.0` |
 | LH-Status | `0.3.0` |
 

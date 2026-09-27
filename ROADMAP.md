@@ -121,7 +121,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Synkronisere kun staff-rollene Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
 - [x] Hindre customer-, product-, notification-, booster-, bot-, member- og muted-roller fra å gi Hub-tilgang.
 - [x] Lage checksum-verifisert Discord-deploy, readiness etter Discord-innlogging, health verification og automatisk rollback.
-- [ ] Koble Discord-identitet til SSO-konto med eksplisitt brukerflyt.
+- [x] Koble Discord-identitet til SSO-konto med eksplisitt `/lh-link`-flyt, hash-lagret engangsbillett og SSO-passkey-bekreftelse.
 - [x] Legge til persistent retry-kø med eksponentiell backoff og beskyttet audit-logg for Discord-rolle-synk.
 - [ ] Produksjonssette boten på Panel-serveren.
 
@@ -135,7 +135,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.1.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.2.0`, SSO `1.2.2`, Hub `0.5.0` og Status `0.3.0`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.3.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
@@ -149,7 +149,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Separate age-krypterte logiske backups av API- og SSO-databasene med atomisk lokal lagring, verifisert FRA1 Spaces-kopi og GFS-retention.
 - [ ] Kvartalsvise restore-drills for begge databasene.
 - [ ] Installere og kontrollere DigitalOcean Monitoring Agent på alle Droplets.
-- [ ] Aggregere DigitalOcean Insights i Hub via read-only API-token.
+- [x] Aggregere DigitalOcean Insights i Hub via read-only API-token med cache og stale fallback.
 - [ ] Definere backup for kundens persistente filer på hostingnoder.
 - [ ] Fastsette retention, RPO og RTO per datakategori.
 - [ ] Lastteste API, SSO og database før kundevekst.
@@ -167,7 +167,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 1. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
 2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
-3. Koble Hub til SSO og bygg server-side DigitalOcean/observability-integrasjoner.
+3. Aktiver Hub OIDC-klienten og de ferdige server-side observability-integrasjonene i produksjon.
 4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
 5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
 6. Kjør backup-, restore-, failover- og sikkerhetstest.
