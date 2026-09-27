@@ -95,7 +95,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Etablere server-side health-innhenting uten å eksponere interne URL-er eller tokens til nettleseren.
 - [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon i Hub.
 - [x] Støtte serverhåndhevede rollebaserte visninger for Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
-- [ ] Legge til audit-logg for support- og administrasjonshandlinger.
+- [x] Legge til API-eid, cursor-paginert audit-logg i Hub for support- og administrasjonshandlinger, med SSO-rollehåndheving og redigering av sensitive metadata.
 - [x] Holde kunde-, produkt- og Discord-varslingsroller utenfor Hub-autorisasjon.
 
 ## Fase 5 – Offentlig status med LH-Status
@@ -135,7 +135,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.36`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.2.0`, SSO `1.2.2`, Hub `0.4.0` og Status `0.3.0`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.1.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.2.0`, SSO `1.2.2`, Hub `0.5.0` og Status `0.3.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.

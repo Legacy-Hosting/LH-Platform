@@ -63,6 +63,8 @@ Agentkommandoer skal fortsatt bindes til node, timestamp, nonce, body og credent
 - Deploy bruker kortlivet, repository-begrenset installation token; brukerens OAuth-token sendes ikke til agenten.
 - Cloudflare-tilkoblinger isoleres per workspace, og DNS/TLS-tokens begrenses til nødvendige soner.
 - Hub bruker et DigitalOcean-token med read-only scopes som `droplet:read` og `monitoring:read`; tokenet brukes bare server-side.
+- Hubs audit-visning videresender den innloggede ansattes kortlivede `lh-hub`-token kun server-side. API-et verifiserer issuer, audience, signatur, alder og staff-rolle på den dedikerte leseruten; det brukes ikke delt statisk admin-token.
+- Audit-metadata redigeres rekursivt for token-, secret-, credential-, password-, cookie-, authorization-, private-key- og content-felter før data forlater API-et.
 - `RELEASES_TOKEN` kan kun skrive til `LH-Releases`.
 
 ## Secrets og lagring
