@@ -35,7 +35,7 @@ LH-Releases/
 | LH-Discord | `1.1.0` |
 | LH-SSO | `1.2.2` |
 | LH-Hub | `0.4.0` |
-| LH-Status | `0.1.1` |
+| LH-Status | `0.2.0` |
 
 Alle ligger som verifiserte LFS-arkiver i `LH-Releases`, med separat checksum
 under tjenestens `SHA256`-mappe.
