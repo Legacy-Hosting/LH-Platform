@@ -19,7 +19,7 @@ Denne rotmappen er et midlertidig migreringsområde. Hver tjeneste eies, testes,
 | `LH-Panel` | Kundepanel og plattformadministrasjon | `ams3-panel-01.legacyh.fyi` | `STARTED` |
 | `LH-SSO` | Felles identitet, OIDC, passkeys, sesjoner og staff-roller | `ams3-sso-01.legacyh.fyi` | `STARTED` |
 | `LH-Hub` | Internt driftsdashboard for Legacy Hosting-ansatte | `ams3-hub-01.legacyh.fyi` | `STARTED` |
-| `LH-Status` | Offentlig og uavhengig statusside | `fra1-status-01.legacyh.fyi` | `PLANNED` |
+| `LH-Status` | Offentlig og uavhengig statusside | `fra1-status-01.legacyh.fyi` | `STARTED` |
 | `LH-Discord` | Discord-integrasjon og synkronisering av staff-roller | Samme server som `LH-Panel`, egen PM2-prosess | `READY` |
 | `LH-Agent` | Overvåking på alle servere og hostingkommandoer på applikasjonsnoder | Alle relevante servere | `READY` |
 | `LH-Releases` | Immutable releasearkiver og SHA-256-filer | GitHub/LFS, ikke en kjørende tjeneste | `READY` |
@@ -78,22 +78,26 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 **Status: `STARTED`**
 
-- [ ] Kreve LH-SSO og staff-rolle for alle Hub-ruter.
+- [x] Beskytte Hub-API-et med LH-SSO JWT/JWKS-verifisering og eksplisitt tillatte staff-roller.
+- [ ] Aktivere OIDC-innlogging i nettleseren når Authorization Code Flow med PKCE er klar i SSO.
 - [ ] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
 - [ ] Vise CPU, minne, disk, last, båndbredde og health per server.
-- [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon uten å eksponere leverandørtokens til nettleseren.
+- [x] Etablere server-side health-innhenting uten å eksponere interne URL-er eller tokens til nettleseren.
+- [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon i Hub.
 - [ ] Støtte rollebaserte visninger for Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
 - [ ] Legge til audit-logg for support- og administrasjonshandlinger.
-- [ ] Holde kunde-, produkt- og Discord-varslingsroller utenfor Hub-autorisasjon.
+- [x] Holde kunde-, produkt- og Discord-varslingsroller utenfor Hub-autorisasjon.
 
 ## Fase 5 – Offentlig status med LH-Status
 
-**Status: `PLANNED`**
+**Status: `STARTED`**
 
-- [ ] Kjøre uavhengig av AMS3, Managed MySQL, API, Panel, Hub og SSO.
-- [ ] Publisere komponentstatus, hendelser og vedlikehold uten interne detaljer.
-- [ ] Kjøre eksterne probes fra FRA1 mot offentlige endepunkter.
-- [ ] Ha separat datalager eller statisk fallback slik at status fortsatt vises ved kontrollplanfeil.
+- [x] Bygge tjenesten uten avhengighet til AMS3, Managed MySQL, API, Panel, Hub eller SSO.
+- [x] Publisere aggregert komponentstatus uten interne URL-er eller feildetaljer.
+- [x] Implementere tidsavgrensede eksterne HTTPS-probes med treg-, feil- og foreldet-status.
+- [x] Lagre status atomisk lokalt og levere siste snapshot via Nginx- og nettleserfallback.
+- [ ] Produksjonssette probe-tjenesten på FRA1 og verifisere fallback under et simulert AMS3-avbrudd.
+- [ ] Publisere hendelser og planlagt vedlikehold uten interne detaljer.
 - [ ] Støtte incidenthistorikk, abonnementsvarsler og RSS/Atom.
 - [ ] Etablere egen varslingsvei som ikke er avhengig av systemet den overvåker.
 
@@ -113,10 +117,10 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 **Status: `STARTED`**
 
-- [x] Separate CI-løp for API, Panel, Agent, Discord og SSO.
+- [x] Separate CI-løp for API, Panel, Agent, Discord, SSO, Hub og Status.
 - [x] Separate release-workflows som publiserer til `LH-Releases`.
 - [x] Git LFS for `.tar.gz`; checksum-filer ligger som vanlig tekst under `SHA256`.
-- [ ] Legge samme workflow til Hub og Status.
+- [x] Legge CI- og release-workflows til Hub og Status.
 - [ ] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
@@ -148,17 +152,18 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 ## Rekkefølge videre
 
-1. Fullfør Hub- og Status-grunnlag med CI og releaseworkflow.
-2. Implementer og test full OIDC/PKCE i SSO.
-3. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
-4. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
-5. Kjør backup-, restore-, failover- og sikkerhetstest.
-6. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
+1. Implementer og test full OIDC/PKCE i SSO.
+2. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
+3. Koble Hub til SSO og bygg server-side DigitalOcean/observability-integrasjoner.
+4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
+5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
+6. Kjør backup-, restore-, failover- og sikkerhetstest.
+7. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
 
 ## Sjekkliste før LH-Platform slettes
 
 - [x] Ingen produksjonsworkflow leser filer fra roten.
-- [ ] Alle kjørende tjenester kan bygges fra en ren klone av eget repository.
+- [x] Alle kjørende tjenester kan bygges fra en ren klone av eget repository.
 - [ ] Hver tjeneste kan deployes og rulles tilbake uten submodules.
 - [x] Backup- og restore-skript eies av `LH-Ops`.
 - [x] Tjenestespesifikke Nginx-filer ligger hos tjenesten; delte systemd-filer ligger i `LH-Ops`.
