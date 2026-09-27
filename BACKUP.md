@@ -30,9 +30,9 @@ For hver database:
 2. Koble med verifisert TLS og DigitalOcean CA.
 3. Ta konsistent dump med routines/events bare dersom tjenesten faktisk bruker dem.
 4. Komprimer før kryptering.
-5. Krypter med `age` til en mottakernøkkel som ikke ligger på samme server som backupen.
+5. Krypter med `age` til en offentlig recipient; den tilhørende private identity-nøkkelen skal ikke ligge på databaseserveren eller i Spaces-kontoen.
 6. Lag SHA-256-checksum av den krypterte filen.
-7. Kopier til en separat konto eller region.
+7. Kopier til en separat, privat FRA1 Spaces-bucket med en tjenestespesifikk scoped key, og les objektet tilbake for SHA-256-verifisering.
 8. Verifiser opplasting og slett plaintext/midlertidige filer.
 
 Anbefalt filnavn:
@@ -43,6 +43,8 @@ lh-sso-db-YYYY-MM-DDTHHMMSSZ.sql.gz.age
 ```
 
 Lokal retention er 14 dager. Off-site retention starter med 35 daglige, 12 månedlige og 3 årlige kopier, og justeres når juridiske og kommersielle krav er fastsatt.
+
+Dette er implementert i `LH-Ops`: API og SSO har separate mode-`0600`, root-eide backupmiljøer, egne systemd timer-instanser, separate Spaces-buckets og ingen restore-admincredential eller privat age identity i den daglige jobben. Backupjobben feiler hvis off-site upload/readback ikke verifiseres. Restore bruker et separat, midlertidig `*-restore.env`, krever navngitt operatør og skriver et hemmelighetsfritt JSONL audit-event.
 
 ## Persistente applikasjonsfiler
 
@@ -89,7 +91,7 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 ## Recoverymål
 
 - API-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
-- SSO-database: mål-RPO opptil 15 minutter med PITR; mål-RTO 60 minutter.
+- SSO-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
 - Releaseartefakter: mål-RPO 0 etter vellykket publisering; mål-RTO 30 minutter fra speil eller rebuild av verifisert tag.
 - Persistente kundefiler: RPO/RTO er ikke lovet før backupfunksjonen er implementert og produktvilkårene er oppdatert.
 - Status: mål-RTO 15 minutter fra statisk fallback eller separat FRA1-deploy.

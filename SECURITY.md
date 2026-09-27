@@ -82,6 +82,7 @@ Agentkommandoer skal fortsatt bindes til node, timestamp, nonce, body og credent
 - Databasepooler skal ha begrenset connection count, timeout og køgrense.
 - Slow query log og Performance Schema brukes kontrollert; `log_queries_not_using_indexes` skal ikke stå permanent på uten måling av volum.
 - DB trusted sources skal ikke inkludere Panel, Hub, Status eller Discord.
+- API- og SSO-backups krypteres lokalt med age før endelig filnavn, lastes til separate private FRA1 Spaces-buckets og verifiseres ved SHA-256 readback. Bare den offentlige recipienten finnes på tjenestehostene; privat identity og restore-admincredentials holdes separat.
 
 ## Release- og forsyningskjedesikkerhet
 

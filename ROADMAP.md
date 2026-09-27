@@ -146,7 +146,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 - [x] Managed MySQL automatiske backups/PITR som primærlag.
 - [x] Agent-heartbeats og applikasjonsmålinger.
-- [ ] Separate krypterte logiske backups av API- og SSO-databasene.
+- [x] Separate age-krypterte logiske backups av API- og SSO-databasene med atomisk lokal lagring, verifisert FRA1 Spaces-kopi og GFS-retention.
 - [ ] Kvartalsvise restore-drills for begge databasene.
 - [ ] Installere og kontrollere DigitalOcean Monitoring Agent på alle Droplets.
 - [ ] Aggregere DigitalOcean Insights i Hub via read-only API-token.
