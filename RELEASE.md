@@ -29,12 +29,12 @@ LH-Releases/
 
 | Tjeneste | Versjon |
 | --- | --- |
-| LH-API | `1.0.35` |
-| LH-Panel | `1.0.36` |
+| LH-API | `1.0.36` |
+| LH-Panel | `1.0.38` |
 | LH-Agent | `1.0.32` |
 | LH-Discord | `1.1.0` |
-| LH-SSO | `1.2.1` |
-| LH-Hub | `0.3.0` |
+| LH-SSO | `1.2.2` |
+| LH-Hub | `0.3.1` |
 | LH-Status | `0.1.1` |
 
 Alle ligger som verifiserte LFS-arkiver i `LH-Releases`, med separat checksum
