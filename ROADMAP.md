@@ -93,7 +93,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
 - [x] Vise CPU, minne, disk, last, båndbredde og health per server, med cache og stale fallback.
 - [x] Etablere server-side health-innhenting uten å eksponere interne URL-er eller tokens til nettleseren.
-- [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon i Hub.
+- [x] Samle API-, Agent-, deployment-, database- og statusinformasjon i Hub gjennom rollebeskyttet API-aggregat og validert offentlig status-snapshot.
 - [x] Støtte serverhåndhevede rollebaserte visninger for Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
 - [x] Legge til API-eid, cursor-paginert audit-logg i Hub for support- og administrasjonshandlinger, med SSO-rollehåndheving og redigering av sensitive metadata.
 - [x] Holde kunde-, produkt- og Discord-varslingsroller utenfor Hub-autorisasjon.
