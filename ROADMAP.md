@@ -144,10 +144,10 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
   betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
 - [ ] Verifisere og tagge de signerte patchkandidatene: API `1.2.1`
-  (`2f2eb22`), Panel `1.0.39` (`25d12a9`), Agent `1.0.33`
-  (`ea45113`), Discord `1.3.1` (`22fb736`), SSO `1.3.1`
-  (`2807a08`), Hub `0.6.1` (`cb31567`) og Status `0.4.1`
-  (`85b9182`). Alle er testet lokalt og som signerte Linux-releasebygg; API
+  (`20343db`), Panel `1.0.39` (`4bed396`), Agent `1.0.33`
+  (`9177bd0`), Discord `1.3.1` (`4dbbe50`), SSO `1.3.1`
+  (`dcad7de`), Hub `0.6.1` (`206441e`) og Status `0.4.1`
+  (`a3fb067`). Alle er testet lokalt og som signerte Linux-releasebygg; API
   og SSO er i tillegg verifisert mot MySQL 8. De eksakte committene kan ikke
   tagges før Actions-betalingsblokkeringen er fjernet og CI er grønn.
 - [x] Implementere fail-closed Ed25519-signering i alle tjenesteworkflows,
