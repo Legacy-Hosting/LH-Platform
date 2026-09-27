@@ -134,7 +134,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.35`, Panel `1.0.35`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.1`, Hub `0.2.1` og Status `0.1.1`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.35`, Panel `1.0.36`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.1`, Hub `0.2.1` og Status `0.1.1`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
