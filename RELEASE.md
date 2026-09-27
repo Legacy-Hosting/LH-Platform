@@ -64,6 +64,11 @@ Før en tag opprettes:
 6. Databaseendringer skal være additive og bakoverkompatible med forrige applikasjonsrelease.
 7. Ingen `.env`, tokens, private nøkler, database-CA eller kundedata skal ligge i arkivet.
 
+Endringer i connection pools, databaseindekser, proxy/cache, runtime eller
+kritiske leseflyter krever i tillegg den bounded smoke-/kapasitetsprosedyren i
+`LH-Ops/docs/capacity-testing.md`. Produksjon får bare den ratebegrensede
+smoke-profilen; metningstest kjøres mot produksjonslik staging.
+
 ## Tjenestespesifikke porter
 
 - `LH-API`: migrasjoner mot ren MySQL 8, integrasjonstester, typecheck og build.

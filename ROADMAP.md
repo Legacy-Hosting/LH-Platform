@@ -135,6 +135,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
+- [ ] Gjenåpne GitHub-hostede Actions-runners ved å rette organisasjonens
+  betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
@@ -158,7 +160,11 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
   hostingnode før funksjonen inngår i et kundeprodukt.
 - [ ] Godkjenne kommersielle retention-, RPO- og RTO-løfter per datakategori;
   tekniske startmål er dokumentert i `BACKUP.md`.
-- [ ] Lastteste API, SSO og database før kundevekst.
+- [x] Lage bounded, read-only kapasitetsverktøy i `LH-Ops` med produksjonsvern,
+  API/SSO readiness-assertions, p50/p95/p99/RPS-gates, SELECT-only MySQL-test,
+  grant-kontroll og før/etter-snapshot fra Performance Schema.
+- [ ] Kjøre dokumentert smoke-test i produksjonsvindu og kapasitetsstige mot
+  produksjonslik staging for API, SSO og database før kundevekst.
 
 ## Fase 9 – Billing og produktstyring
 
