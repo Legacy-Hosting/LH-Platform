@@ -86,7 +86,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 **Status: `STARTED`**
 
 - [x] Beskytte Hub-API-et med LH-SSO JWT/JWKS-verifisering og eksplisitt tillatte staff-roller.
-- [ ] Aktivere OIDC-innlogging i nettleseren når Authorization Code Flow med PKCE er klar i SSO.
+- [x] Implementere Hub-innlogging med Authorization Code + PKCE, server-side tokenhåndtering, roterende refresh-token og HttpOnly nettlesersesjon.
+- [ ] Aktivere Hub OIDC-klienten og callbacken i produksjon.
 - [ ] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
 - [ ] Vise CPU, minne, disk, last, båndbredde og health per server.
 - [x] Etablere server-side health-innhenting uten å eksponere interne URL-er eller tokens til nettleseren.
