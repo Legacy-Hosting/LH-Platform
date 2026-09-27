@@ -122,7 +122,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Hindre customer-, product-, notification-, booster-, bot-, member- og muted-roller fra å gi Hub-tilgang.
 - [x] Lage checksum-verifisert Discord-deploy, readiness etter Discord-innlogging, health verification og automatisk rollback.
 - [ ] Koble Discord-identitet til SSO-konto med eksplisitt brukerflyt.
-- [ ] Legge til retry-kø og audit-logg for mislykket synkronisering.
+- [x] Legge til persistent retry-kø med eksponentiell backoff og beskyttet audit-logg for Discord-rolle-synk.
 - [ ] Produksjonssette boten på Panel-serveren.
 
 ## Fase 7 – Releases og produksjonsdrift
@@ -135,7 +135,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.36`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.2`, Hub `0.4.0` og Status `0.3.0`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.36`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.2.0`, SSO `1.2.2`, Hub `0.4.0` og Status `0.3.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
