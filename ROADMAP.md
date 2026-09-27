@@ -150,8 +150,14 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Kvartalsvise restore-drills for begge databasene.
 - [ ] Installere og kontrollere DigitalOcean Monitoring Agent på alle Droplets.
 - [x] Aggregere DigitalOcean Insights i Hub via read-only API-token med cache og stale fallback.
-- [ ] Definere backup for kundens persistente filer på hostingnoder.
-- [ ] Fastsette retention, RPO og RTO per datakategori.
+- [x] Definere og implementere opt-in backup av kundens persistent-stier med
+  symlink-sikker allowlist, lokal `age`-kryptering, verifisert FRA1-kopi,
+  GFS-retention, separat staging, eksplisitt restorebekreftelse, rollback-kopi
+  og audit-logg i `LH-Ops`.
+- [ ] Aktivere og kontrollere første persistent-file backup/restore på en
+  hostingnode før funksjonen inngår i et kundeprodukt.
+- [ ] Godkjenne kommersielle retention-, RPO- og RTO-løfter per datakategori;
+  tekniske startmål er dokumentert i `BACKUP.md`.
 - [ ] Lastteste API, SSO og database før kundevekst.
 
 ## Fase 9 – Billing og produktstyring

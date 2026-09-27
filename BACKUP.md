@@ -8,7 +8,7 @@ DigitalOcean Managed MySQL sine automatiske backups og point-in-time recovery (P
 | --- | --- | --- | --- |
 | Kunder, workspaces, applikasjoner, deployments og integrasjoner | `LH-API`-database | Managed MySQL PITR | Daglig kryptert logical dump |
 | Identiteter, passkeys, OIDC grants, sesjoner og staff-roller | `LH-SSO`-database | Managed MySQL PITR | Daglig kryptert logical dump |
-| Kundens persistente applikasjonsfiler | Hostingnode/LH-Agent | Skal defineres per produkt | Kryptert objektlagring i annen feilregion |
+| Kundens persistente applikasjonsfiler | Hostingnode/LH-Ops | Lokal kryptert kopi med kort retention | Verifisert, kryptert FRA1 Spaces-kopi |
 | Releaseartefakter | `LH-Releases` | GitHub + Git LFS | Periodisk verifisert speil/eksport |
 | Kildekode og konfigurasjonsmaler | Hvert tjenesterepository | GitHub | Organisasjonsbackup/eksport |
 | Produksjonssecrets | Beskyttet server/secret store | Kontrollert secret-backup | Offline recovery-sett med separat tilgang |
@@ -50,17 +50,35 @@ Dette er implementert i `LH-Ops`: API og SSO har separate mode-`0600`, root-eide
 
 ## Persistente applikasjonsfiler
 
-`file:`- og `directory:`-stier i hostingplattformen overlever deploy, men er ikke automatisk off-site backup. Før produktet selges med backupgaranti må følgende være implementert:
+`file:`- og `directory:`-stier i hostingplattformen overlever deploy. `LH-Ops`
+har nå en separat, opt-in backup- og restoreflyt for disse dataene. En
+applikasjon er ikke beskyttet før Infrastructure har opprettet en root-eid
+mode-`0600` konfigurasjon og allowlist, kjørt første backup, verifisert remote
+readback og aktivert den tilhørende systemd-timeren.
 
-- eksplisitt opt-in eller planstyrt backup per applikasjon;
-- allowlist av persistente stier;
-- snapshots uten å følge symlinks utenfor applikasjonsroten;
-- kryptert objektlagring i annen region;
-- retention og kundestyrt restorepunkt;
-- restore til staging før overskriving av live data;
-- audit-logg for opprettelse, sletting og restore.
+Den implementerte policyen er:
 
-Databasefiler, sockets, caches, `node_modules` og midlertidige deploymapper skal ekskluderes som standard.
+- eksplisitt opt-in eller planstyrt aktivering per applikasjon;
+- en root-eid allowlist som skal samsvare med applikasjonens deklarerte
+  persistent-stier;
+- snapshots som avviser symlinks i hele stien og alle sockets, devices og
+  andre spesialfiler;
+- lokal `age`-kryptering før opplasting til privat FRA1 Spaces med scoped key;
+- SHA-256 readback-verifisering av både arkiv og checksum;
+- 2 dager lokal retention og 35 daglige, 12 månedlige og 3 årlige off-site
+  kopier;
+- kundens valgte restorepunkt stages og valideres fullstendig før en navngitt
+  operatør kan overskrive live-data med eksplisitt applikasjons-ID-bekreftelse;
+- lokal pre-restore rollback-kopi i 7 dager og automatisk rollback av stier som
+  allerede er endret dersom apply feiler;
+- root-beskyttet JSONL-audit for opprettelse, retention-sletting, staging,
+  vellykket restore og feil.
+
+Databasefiler, sockets, caches, `node_modules` og midlertidige stier avvises
+eller ekskluderes som standard. Den private `age` identity-nøkkelen finnes ikke
+i daglig backupkonfigurasjon eller Spaces; den installeres bare midlertidig fra
+separat operatørforvaring ved restore. Detaljert prosedyre og eksempelfiler
+ligger i `LH-Ops`.
 
 ## Restore-drill for API og SSO
 
@@ -95,7 +113,10 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 - API-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
 - SSO-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
 - Releaseartefakter: mål-RPO 0 etter vellykket publisering; mål-RTO 30 minutter fra speil eller rebuild av verifisert tag.
-- Persistente kundefiler: RPO/RTO er ikke lovet før backupfunksjonen er implementert og produktvilkårene er oppdatert.
+- Persistente kundefiler: teknisk mål-RPO 24 timer og mål-RTO 4 timer for en
+  aktivert applikasjon etter første verifiserte off-site backup. Dette er ikke
+  en kundegaranti før planen, bemanningstiden og produktvilkårene uttrykkelig
+  inkluderer backup; applikasjoner uten aktiv timer har ingen backupgaranti.
 - Status: mål-RTO 15 minutter fra statisk fallback eller separat FRA1-deploy; Web Push-state har mål-RPO 24 timer inntil egen hyppigere backup er aktivert.
 
 ## Ansvar og varsling
@@ -106,4 +127,6 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 - Alle restore-operasjoner og sletting av backups logges og krever navngitt operatør.
 - Mislykket backup, manglende off-site kopi eller utløpt restore-drill skal varsles som en driftsfeil.
 
-Backup- og restore-skriptene eies nå av `LH-Ops`. API og SSO bruker separate, beskyttede konfigurasjoner og egne systemd timer-instanser; `LH-Platform` er ikke lenger en backupavhengighet.
+Backup- og restore-skriptene eies nå av `LH-Ops`. API, SSO og hver beskyttet
+kundeapplikasjon bruker separate, root-eide konfigurasjoner og egne systemd
+timer-instanser; `LH-Platform` er ikke lenger en backupavhengighet.

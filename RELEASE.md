@@ -135,6 +135,13 @@ gangen:
 5. Verifiser ekstern HTTPS, Cloudflare og én kritisk brukerflyt.
 6. Kontroller Agent-heartbeat og Hub/Status før neste tjeneste flyttes.
 
+Før en hostingnode eller en applikasjon med backupinkludert plan tas i bruk,
+installeres `LH-Ops` sine application-backup jobs. Første timeraktivering skjer
+først etter at allowlisten er kontrollert mot Panel, FRA1 Spaces-credential er
+scoped, en backup har fullført remote readback, og staging av samme arkiv er
+verifisert uten å endre live-data. Privat `age` identity skal ikke ligge fast på
+hostingnoden.
+
 Deploy-skriptene eier SHA-256-kontroll, versjonert utpakking, låste
 produksjonsavhengigheter, beskyttede miljøfiler, atomisk `current`-symlink,
 PM2/Nginx og lokal health verification. API og SSO nekter å migrere før den

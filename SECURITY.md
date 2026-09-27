@@ -90,6 +90,15 @@ Agentkommandoer skal fortsatt bindes til node, timestamp, nonce, body og credent
 - Slow query log og Performance Schema brukes kontrollert; `log_queries_not_using_indexes` skal ikke stå permanent på uten måling av volum.
 - DB trusted sources skal ikke inkludere Panel, Hub, Status eller Discord.
 - API- og SSO-backups krypteres lokalt med age før endelig filnavn, lastes til separate private FRA1 Spaces-buckets og verifiseres ved SHA-256 readback. Bare den offentlige recipienten finnes på tjenestehostene; privat identity og restore-admincredentials holdes separat.
+- Opt-in backup av kundens persistent-stier følger samme kryptografiske grense:
+  hostingnoden har bare offentlig `age` recipient og en scoped Spaces-key,
+  mens privat identity installeres midlertidig fra separat operatørforvaring ved
+  restore. Allowlisten og konfigurasjonen er root-eid med mode `0600`.
+- Persistent-file backup avviser absolutte/overlappende stier, traversal,
+  symlinks i alle path-komponenter, spesialfiler, databaser, caches,
+  `node_modules` og temp-stier. Restore verifiserer checksum, arkivmedlemmer,
+  manifest, applikasjons-ID og gjeldende allowlist i staging før live-data kan
+  endres med eksplisitt bekreftelse og lokal rollback-kopi.
 
 ## Release- og forsyningskjedesikkerhet
 
