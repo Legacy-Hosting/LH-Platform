@@ -53,13 +53,13 @@ på de nye serverne.
 
 | Tjeneste | Versjon | Verifisert commit |
 | --- | --- | --- |
-| LH-API | `1.2.1` | `20343db` |
-| LH-Panel | `1.0.39` | `4bed396` |
+| LH-API | `1.2.1` | `e0f2f5d` |
+| LH-Panel | `1.0.39` | `26d1723` |
 | LH-Agent | `1.0.33` | `9177bd0` |
-| LH-Discord | `1.3.1` | `4dbbe50` |
-| LH-SSO | `1.3.1` | `dcad7de` |
-| LH-Hub | `0.6.1` | `206441e` |
-| LH-Status | `0.4.1` | `a3fb067` |
+| LH-Discord | `1.3.1` | `62958f2` |
+| LH-SSO | `1.3.1` | `f57aeae` |
+| LH-Hub | `0.6.1` | `de4931a` |
+| LH-Status | `0.4.1` | `499cf92` |
 
 Kandidatene er lokalt testet og bygget fra rene commits i Node
 24/Linux-miljøer med midlertidige Ed25519-testnøkler. Checksum, 64-byte signatur
@@ -67,8 +67,11 @@ og release-manifest er verifisert. Release-workflowene krever annotert semver-ta
 på en commit i `main`, samsvarende `package.json` og rent worktree. Kandidatene
 er ikke tagget eller publisert. Signeringsnøkkelen er avgrenset til
 signeringssteget, mens `RELEASES_TOKEN` først blir tilgjengelig etter bygg og
-artifact-opplasting. Før publisering må CI kunne kjøre grønt, og
-produksjonsnøklene må opprettes og provisioneres etter nøkkelprosedyren.
+artifact-opplasting. Rollback-scriptet gjenoppretter nå originalrelease
+automatisk dersom målrelease ikke starter eller består helsesjekken, og
+verify-scriptet avviser avvik mellom symlink og `current-release`. Før
+publisering må CI kunne kjøre grønt, og produksjonsnøklene må opprettes og
+provisioneres etter nøkkelprosedyren.
 
 ## Tilgang til LH-Releases
 

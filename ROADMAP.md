@@ -144,10 +144,10 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
   betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
 - [ ] Verifisere og tagge de signerte patchkandidatene: API `1.2.1`
-  (`20343db`), Panel `1.0.39` (`4bed396`), Agent `1.0.33`
-  (`9177bd0`), Discord `1.3.1` (`4dbbe50`), SSO `1.3.1`
-  (`dcad7de`), Hub `0.6.1` (`206441e`) og Status `0.4.1`
-  (`a3fb067`). Alle er testet lokalt og som signerte Linux-releasebygg; API
+  (`e0f2f5d`), Panel `1.0.39` (`26d1723`), Agent `1.0.33`
+  (`9177bd0`), Discord `1.3.1` (`62958f2`), SSO `1.3.1`
+  (`f57aeae`), Hub `0.6.1` (`de4931a`) og Status `0.4.1`
+  (`499cf92`). Alle er testet lokalt og som signerte Linux-releasebygg; API
   og SSO er i tillegg verifisert mot MySQL 8. De eksakte committene kan ikke
   tagges før Actions-betalingsblokkeringen er fjernet og CI er grønn.
 - [x] Implementere fail-closed Ed25519-signering i alle tjenesteworkflows,
@@ -157,7 +157,11 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
   lagre kryptert offline recovery-kopi, konfigurere
   `RELEASE_SIGNING_PRIVATE_KEY_B64`, provisionere de offentlige nøklene og
   publisere første signerte patchrelease.
-- [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
+- [x] Teste transaksjonell rollback for API, Panel, Discord, SSO, Hub og Status
+  i isolerte, skrivebeskyttede Ubuntu 26.04-containere, inkludert tvungen feil
+  og kontroll av symlink og release-markør.
+- [ ] Verifisere restore og faktisk rollback på en ren provisionert Ubuntu
+  26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
 
 ## Fase 8 – Backup, observability og kapasitet
