@@ -49,6 +49,23 @@ under tjenestens `SHA256`-mappe. Disse historiske kandidatene ble publisert før
 signeringskravet og skal erstattes av nye signerte patchreleaser før utrulling
 på de nye serverne.
 
+### Ventende signerte patchkandidater
+
+| Tjeneste | Versjon | Verifisert commit |
+| --- | --- | --- |
+| LH-API | `1.2.1` | `dbe91ac` |
+| LH-Panel | `1.0.39` | `2145cd4` |
+| LH-Agent | `1.0.33` | `55c743e` |
+| LH-Discord | `1.3.1` | `78fb15c` |
+| LH-SSO | `1.3.1` | `f329467` |
+| LH-Hub | `0.6.1` | `9d1089d` |
+| LH-Status | `0.4.1` | `28f20ae` |
+
+Kandidatene er lokalt testet og bygget i rene Node 24/Linux-miljøer med
+midlertidige Ed25519-testnøkler. Checksum, 64-byte signatur og release-manifest
+er verifisert. De er ikke tagget eller publisert; først må CI kunne kjøre grønt,
+og produksjonsnøklene må opprettes og provisioneres etter nøkkelprosedyren.
+
 ## Tilgang til LH-Releases
 
 Hvert tjenesterepository bruker Actions-secret `RELEASES_TOKEN` med minst mulig tilgang:

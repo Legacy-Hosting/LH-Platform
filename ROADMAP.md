@@ -143,11 +143,13 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Gjenåpne GitHub-hostede Actions-runners ved å rette organisasjonens
   betaling/spending limit; nye jobber avsluttes før runner og uten teststeg.
 - [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
-- [ ] Verifisere og tagge API `1.2.1` (`dbe91ac`) og SSO `1.3.1`
-  (`f329467`). Begge er verifisert lokalt mot MySQL 8 og som signerte
-  releasebygg, men de eksakte
-  committene kan ikke tagges før Actions-betalingsblokkeringen er fjernet og CI
-  er grønn.
+- [ ] Verifisere og tagge de signerte patchkandidatene: API `1.2.1`
+  (`dbe91ac`), Panel `1.0.39` (`2145cd4`), Agent `1.0.33`
+  (`55c743e`), Discord `1.3.1` (`78fb15c`), SSO `1.3.1`
+  (`f329467`), Hub `0.6.1` (`9d1089d`) og Status `0.4.1`
+  (`28f20ae`). Alle er testet lokalt og som signerte Linux-releasebygg; API
+  og SSO er i tillegg verifisert mot MySQL 8. De eksakte committene kan ikke
+  tagges før Actions-betalingsblokkeringen er fjernet og CI er grønn.
 - [x] Implementere fail-closed Ed25519-signering i alle tjenesteworkflows,
   separat `SIGNATURES`-struktur, fingerprint-kontrollert nøkkelprovisionering og
   signaturverifisering før utpakking eller Agent-promotering.
@@ -194,7 +196,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 ## Rekkefølge videre
 
 1. Rett GitHub Actions-betaling/spending limit, kjør CI på nytt og publiser de
-   ventende API- og SSO-patchreleaseene.
+   syv ventende signerte patchreleaseene.
 2. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
 3. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
 4. Aktiver Hub OIDC-klienten og de ferdige server-side observability-integrasjonene i produksjon.
