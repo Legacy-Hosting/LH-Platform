@@ -65,12 +65,15 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 - [x] Opprette separat SSO-database og migreringsløp.
 - [x] Opprette autentisert Discord-rolle-synk med tillatte staff-roller.
-- [ ] Implementere OIDC Authorization Code Flow med PKCE.
-- [ ] Implementere signering, JWKS, nøkkelrotasjon og kortlivede tokens.
+- [x] Implementere OIDC Authorization Code Flow med påtvunget PKCE for alle klienter.
+- [x] Implementere ES256-signering, offentlig JWKS, nøkkelrotasjon og kortlivede access-/ID-tokens.
+- [x] Persistere OIDC-sesjoner, grants, koder og tokens i SSO-databasen med utløpsrydding.
+- [x] Etablere en tidsbegrenset engangsbillett-bro fra eksisterende Panel-login til SSO-interaksjoner.
 - [ ] Flytte passkeys/WebAuthn og kontogjenoppretting til SSO.
-- [ ] Registrere Panel, Hub og andre tjenester som separate OIDC-klienter.
+- [x] Støtte statisk allowlistede OIDC-klienter og separate resource-audiences for Panel, Hub og API.
+- [ ] Konfigurere produksjonsklienter, secrets og callback-URL-er på de nye serverne.
 - [ ] Migrere eksisterende Panel-brukere, identiteter og aktive sesjoner kontrollert.
-- [ ] Beholde host-only cookies; ikke dele én sesjonscookie på hele domenet.
+- [x] Bruke Secure, HttpOnly, SameSite og host-only SSO-cookies uten delt domene-cookie.
 - [ ] Legge til logout og session revocation på tvers av tjenester.
 - [ ] Fjerne gammel API-innlogging først etter parallell drift og godkjent rollback-test.
 
@@ -152,8 +155,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 ## Rekkefølge videre
 
-1. Implementer og test full OIDC/PKCE i SSO.
-2. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
+1. Koble eksisterende Panel-login til SSO-engangsbilletten og implementer OIDC callback med parallell drift.
+2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
 3. Koble Hub til SSO og bygg server-side DigitalOcean/observability-integrasjoner.
 4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
 5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
