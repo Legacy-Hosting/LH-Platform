@@ -69,6 +69,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Implementere ES256-signering, offentlig JWKS, nøkkelrotasjon og kortlivede access-/ID-tokens.
 - [x] Persistere OIDC-sesjoner, grants, koder og tokens i SSO-databasen med utløpsrydding.
 - [x] Etablere en tidsbegrenset engangsbillett-bro fra eksisterende Panel-login til SSO-interaksjoner.
+- [x] La autentiserte Panel-sesjoner fullføre SSO-interaksjoner med samme immutable bruker-UUID, uten å eksponere brotokenet i nettleseren.
 - [ ] Flytte passkeys/WebAuthn og kontogjenoppretting til SSO.
 - [x] Støtte statisk allowlistede OIDC-klienter og separate resource-audiences for Panel, Hub og API.
 - [ ] Konfigurere produksjonsklienter, secrets og callback-URL-er på de nye serverne.
@@ -155,7 +156,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 ## Rekkefølge videre
 
-1. Koble eksisterende Panel-login til SSO-engangsbilletten og implementer OIDC callback med parallell drift.
+1. Implementer OIDC callback og BFF-sesjon for Panel/API, og kjør dette parallelt med eksisterende Panel-login.
 2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
 3. Koble Hub til SSO og bygg server-side DigitalOcean/observability-integrasjoner.
 4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
