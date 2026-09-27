@@ -70,6 +70,8 @@ Agentkommandoer skal fortsatt bindes til node, timestamp, nonce, body og credent
 - Audit-metadata redigeres rekursivt for token-, secret-, credential-, password-, cookie-, authorization-, private-key- og content-felter før data forlater API-et.
 - Hubs operations-visning bruker samme kortlivede brukerautorisasjon mot et avgrenset API-aggregat. Den returnerer bare tellere, tilstand, tidsstempler og et begrenset sett deploymentmetadata; Hub får aldri direkte databaseforbindelse, kundehemmeligheter eller deploymentlogger.
 - Offentlig status hentes fra LH-Status sitt validerte snapshot med kort server-side cache. API- og statusfeil isoleres slik at én utilgjengelig datakilde ikke skjuler den andre.
+- LH-Status sender Web Push fra FRA1 uten API-, SSO-, MySQL- eller Discord-avhengighet. Offentlige subscribe-kall krever same-origin, rate limit, gyldig push-nøkkelmateriale og en HTTPS-endpoint under en eksplisitt browser-provider-allowlist for å hindre SSRF.
+- Push-endpoints, autentiseringsnøkler og retry-kø lagres atomisk med mode `0600`, returneres aldri av API-et og skal ikke skrives i logger. VAPID private key ligger bare i den root-eide Status-konfigurasjonen.
 - `RELEASES_TOKEN` kan kun skrive til `LH-Releases`.
 
 ## Secrets og lagring

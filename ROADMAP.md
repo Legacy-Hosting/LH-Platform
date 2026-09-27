@@ -109,8 +109,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [ ] Produksjonssette probe-tjenesten på FRA1 og verifisere fallback under et simulert AMS3-avbrudd.
 - [x] Publisere hendelser og planlagt vedlikehold i det atomiske fallback-snapshotet uten interne detaljer.
 - [x] Støtte incidenthistorikk og offentlig Atom-feed fra samme validerte snapshot.
-- [ ] Legge til abonnementsvarsler for statusendringer.
-- [ ] Etablere egen varslingsvei som ikke er avhengig av systemet den overvåker.
+- [x] Legge til same-origin Web Push-abonnement med service worker, leverandør-allowlist og beskyttet unsubscribe-flyt.
+- [x] Etablere FRA1-basert varslingsvei med atomisk lokal kø, vedvarende eksponentiell retry og ingen avhengighet til AMS3, API, SSO, MySQL eller Discord.
 
 ## Fase 6 – Discord og rollemodell
 
@@ -135,7 +135,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.3.0`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.2.0`, Panel `1.0.38`, Agent `1.0.32`, Discord `1.3.0`, SSO `1.3.0`, Hub `0.6.0` og Status `0.4.0`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
@@ -168,7 +168,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 1. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
 2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
 3. Aktiver Hub OIDC-klienten og de ferdige server-side observability-integrasjonene i produksjon.
-4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
+4. Konfigurer VAPID-nøkler og produksjonsverifiser incidents, vedlikehold og Web Push fra FRA1.
 5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
 6. Kjør backup-, restore-, failover- og sikkerhetstest.
 7. Arkiver nødvendige historiske referanser og slett `LH-Platform`.

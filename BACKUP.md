@@ -12,9 +12,11 @@ DigitalOcean Managed MySQL sine automatiske backups og point-in-time recovery (P
 | Releaseartefakter | `LH-Releases` | GitHub + Git LFS | Periodisk verifisert speil/eksport |
 | Kildekode og konfigurasjonsmaler | Hvert tjenesterepository | GitHub | Organisasjonsbackup/eksport |
 | Produksjonssecrets | Beskyttet server/secret store | Kontrollert secret-backup | Offline recovery-sett med separat tilgang |
-| Statushendelser | `LH-Status` | Eget statuslager | Eksport uavhengig av AMS3 |
+| Statushendelser, Web Push-abonnement og retry-kø | `LH-Status` | Atomiske lokale filer i FRA1 | Kryptert eksport uavhengig av AMS3 |
 
 GitHub er ikke backup for database, kundedata eller server-secrets. `LH-Releases` inneholder kun deploybare artefakter og checksums.
+
+LH-Status sin `push-state.json` inneholder sensitive push-endpoints og autentiseringsmateriale og skal behandles som person-/credential-data. Backupen må krypteres før den forlater FRA1. Samme VAPID-nøkkelpar må gjenopprettes sammen med filen; ved tap av enten nøkkelpar eller state må berørte nettlesere abonnere på nytt. Historiske leveranser skal ikke sendes på nytt etter restore.
 
 ## Databaseisolering
 
@@ -94,7 +96,7 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 - SSO-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
 - Releaseartefakter: mål-RPO 0 etter vellykket publisering; mål-RTO 30 minutter fra speil eller rebuild av verifisert tag.
 - Persistente kundefiler: RPO/RTO er ikke lovet før backupfunksjonen er implementert og produktvilkårene er oppdatert.
-- Status: mål-RTO 15 minutter fra statisk fallback eller separat FRA1-deploy.
+- Status: mål-RTO 15 minutter fra statisk fallback eller separat FRA1-deploy; Web Push-state har mål-RPO 24 timer inntil egen hyppigere backup er aktivert.
 
 ## Ansvar og varsling
 

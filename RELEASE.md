@@ -35,7 +35,7 @@ LH-Releases/
 | LH-Discord | `1.3.0` |
 | LH-SSO | `1.3.0` |
 | LH-Hub | `0.6.0` |
-| LH-Status | `0.3.0` |
+| LH-Status | `0.4.0` |
 
 Alle ligger som verifiserte LFS-arkiver i `LH-Releases`, med separat checksum
 under tjenestens `SHA256`-mappe.
@@ -71,7 +71,7 @@ Før en tag opprettes:
 - `LH-Agent`: enhetstester, typecheck, build og test av både `hosting-node` og `monitor-only`.
 - `LH-SSO`: migrasjoner mot ren MySQL 8, sikkerhetstester, token-/OIDC-tester og build.
 - `LH-Hub`: autentisering/autorisasjon, mockede DigitalOcean-responser, build og UI-test.
-- `LH-Status`: probe-, incident- og fallbacktester samt produksjonsbuild.
+- `LH-Status`: probe-, incident-, fallback-, Web Push-kø-, SSRF-allowlist- og same-origin-tester samt produksjonsbuild.
 - `LH-Discord`: rolle-ID-policy, SSO-kontrakt, typecheck og build.
 
 ## Opprette en release
