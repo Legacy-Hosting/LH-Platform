@@ -24,7 +24,7 @@ Denne rotmappen er et midlertidig migreringsområde. Hver tjeneste eies, testes,
 | `LH-Agent` | Overvåking på alle servere og hostingkommandoer på applikasjonsnoder | Alle relevante servere | `READY` |
 | `LH-Releases` | Immutable releasearkiver og SHA-256-filer | GitHub/LFS, ikke en kjørende tjeneste | `READY` |
 | `LH-Ops` | Felles infrastruktur, serverbootstrap, backup og restore-drills | Privat driftsrepository, ikke en kjørende tjeneste | `READY` |
-| `LH-Platform` | Gammel samlet orkestrering | Skal ikke deployes videre | `STARTED` utfasing |
+| `LH-Platform` | Gammel samlet orkestrering | Skal ikke deployes videre | Klar for arkivering etter produksjonsverifisering |
 
 API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` for å unngå at én regionfeil skjuler driftsstatus. Managed MySQL ligger i AMS3. Bare API og SSO skal ha databasetilgang.
 
@@ -37,8 +37,9 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Opprette sentral release-struktur med egen `SHA256`-mappe per tjeneste.
 - [x] Opprette `LH-Ops` for felles infrastruktur, topologi, backup og restore-drills.
 - [x] Etablere Node.js 24 LTS som runtime-baseline.
-- [ ] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
-- [ ] Fjerne submodule-avhengigheter og den gamle samlede releaseflyten.
+- [x] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
+- [x] Fjerne den gamle samlede release- og CI-flyten fra `LH-Platform`.
+- [ ] Fjerne de siste submodule-referansene når migreringsrepoet arkiveres.
 - [ ] Arkivere og deretter slette `LH-Platform` når slettesjekklisten nederst er fullført.
 
 ## Fase 2 – API, Panel og hostingplattform
@@ -148,19 +149,18 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 ## Rekkefølge videre
 
 1. Fullfør Hub- og Status-grunnlag med CI og releaseworkflow.
-2. Flytt driftsfiler fra `LH-Platform` til riktig tjenesterepository.
-3. Implementer og test full OIDC/PKCE i SSO.
-4. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
-5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
-6. Kjør backup-, restore-, failover- og sikkerhetstest.
-7. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
+2. Implementer og test full OIDC/PKCE i SSO.
+3. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
+4. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
+5. Kjør backup-, restore-, failover- og sikkerhetstest.
+6. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
 
 ## Sjekkliste før LH-Platform slettes
 
-- [ ] Ingen produksjonsworkflow leser filer fra roten.
+- [x] Ingen produksjonsworkflow leser filer fra roten.
 - [ ] Alle kjørende tjenester kan bygges fra en ren klone av eget repository.
 - [ ] Hver tjeneste kan deployes og rulles tilbake uten submodules.
-- [ ] Backup- og restore-skript eies av API/SSO eller et eksplisitt ops-repository.
-- [ ] Nginx- og systemd-filer ligger hos tjenesten som bruker dem.
+- [x] Backup- og restore-skript eies av `LH-Ops`.
+- [x] Tjenestespesifikke Nginx-filer ligger hos tjenesten; delte systemd-filer ligger i `LH-Ops`.
 - [ ] Siste samlede release er beholdt som historisk artefakt, ikke som aktiv deploykilde.
 - [ ] Alle secrets er rotert etter utfasing av gammel server og workflow.

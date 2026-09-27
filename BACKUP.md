@@ -102,4 +102,4 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 - Alle restore-operasjoner og sletting av backups logges og krever navngitt operatør.
 - Mislykket backup, manglende off-site kopi eller utløpt restore-drill skal varsles som en driftsfeil.
 
-De eksisterende backup-skriptene i `LH-Platform/ops` er midlertidige. De må flyttes til riktig repository eller et eksplisitt ops-repository og verifiseres der før `LH-Platform` slettes.
+Backup- og restore-skriptene eies nå av `LH-Ops`. API og SSO bruker separate, beskyttede konfigurasjoner og egne systemd timer-instanser; `LH-Platform` er ikke lenger en backupavhengighet.
