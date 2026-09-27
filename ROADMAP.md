@@ -90,8 +90,8 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Beskytte Hub-API-et med LH-SSO JWT/JWKS-verifisering og eksplisitt tillatte staff-roller.
 - [x] Implementere Hub-innlogging med Authorization Code + PKCE, server-side tokenhåndtering, roterende refresh-token og HttpOnly nettlesersesjon.
 - [ ] Aktivere Hub OIDC-klienten og callbacken i produksjon.
-- [ ] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
-- [ ] Vise CPU, minne, disk, last, båndbredde og health per server.
+- [x] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
+- [x] Vise CPU, minne, disk, last, båndbredde og health per server, med cache og stale fallback.
 - [x] Etablere server-side health-innhenting uten å eksponere interne URL-er eller tokens til nettleseren.
 - [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon i Hub.
 - [ ] Støtte rollebaserte visninger for Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
@@ -134,7 +134,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [x] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
-- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.35`, Panel `1.0.36`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.1`, Hub `0.2.1` og Status `0.1.1`.
+- [x] Tagge og publisere produksjonsklare split-releaser: API `1.0.35`, Panel `1.0.36`, Agent `1.0.32`, Discord `1.1.0`, SSO `1.2.1`, Hub `0.3.0` og Status `0.1.1`.
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [x] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
