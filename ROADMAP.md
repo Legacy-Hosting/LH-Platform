@@ -70,6 +70,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 - [x] Persistere OIDC-sesjoner, grants, koder og tokens i SSO-databasen med utløpsrydding.
 - [x] Etablere en tidsbegrenset engangsbillett-bro fra eksisterende Panel-login til SSO-interaksjoner.
 - [x] La autentiserte Panel-sesjoner fullføre SSO-interaksjoner med samme immutable bruker-UUID, uten å eksponere brotokenet i nettleseren.
+- [x] Implementere Authorization Code + PKCE callback som BFF i LH-API og opprette eksisterende HttpOnly Panel-sesjon etter validert ID-token.
 - [ ] Flytte passkeys/WebAuthn og kontogjenoppretting til SSO.
 - [x] Støtte statisk allowlistede OIDC-klienter og separate resource-audiences for Panel, Hub og API.
 - [ ] Konfigurere produksjonsklienter, secrets og callback-URL-er på de nye serverne.
@@ -156,7 +157,7 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 
 ## Rekkefølge videre
 
-1. Implementer OIDC callback og BFF-sesjon for Panel/API, og kjør dette parallelt med eksisterende Panel-login.
+1. Konfigurer Panel-klienten og secrets i produksjon, kjør OIDC parallelt med eksisterende Panel-login og gjennomfør rollback-test.
 2. Flytt passkeys, kontogjenoppretting og brukeridentiteter kontrollert til SSO.
 3. Koble Hub til SSO og bygg server-side DigitalOcean/observability-integrasjoner.
 4. Fullfør incidents, vedlikehold og uavhengig varsling i Status.
