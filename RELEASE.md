@@ -177,7 +177,12 @@ Bytt tjenestenavn og filnavn etter behov.
 | Status | `fra1-status-01.legacyh.fyi` | `status.legacyhosting.xyz` |
 | Discord | Panel-serveren | Ingen offentlig HTTP-tjeneste |
 
-Origin-DNS skal være DNS-only, mens offentlige CNAME-er kan være proxied. Cloudflare SSL/TLS skal stå i `Full (strict)`.
+Origin-navnene under `legacyh.fyi` skal ha serverens A- og AAAA-poster og være
+DNS-only. Alle offentlige tjenestenavn under `legacyhosting.xyz` skal opprettes
+som proxied CNAME-er mot riktig origin-navn; det skal ikke opprettes egne A-
+eller AAAA-poster for disse tjenestene. Cloudflare kan vise sine egne A- og
+AAAA-adresser i offentlige oppslag på grunn av CNAME flattening. Cloudflare
+SSL/TLS skal stå i `Full (strict)`.
 
 ## Utrulling
 

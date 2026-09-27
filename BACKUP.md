@@ -97,7 +97,7 @@ Restore-drill gjennomføres før første produksjonssetting og deretter minst kv
 
 ## Full gjenopprettingsrekkefølge
 
-1. Opprett nettverk, brannmur, DNS-only origin records og Cloudflare Full (strict).
+1. Opprett nettverk og brannmur, DNS-only A/AAAA-originposter under `legacyh.fyi`, proxied CNAME-er fra `legacyhosting.xyz`, og Cloudflare Full (strict).
 2. Gjenopprett Managed MySQL eller velg PITR-tidspunkt.
 3. Gjenopprett SSO-database og start SSO.
 4. Gjenopprett API-database og start API/arbeidere.
