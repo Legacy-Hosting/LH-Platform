@@ -79,6 +79,11 @@ Hvert repository bruker i tillegg sin egen
 tilgjengelig for release-workflowen og skal ha en kryptert offline recovery-kopi
 utenfor GitHub og produksjon. Bare den offentlige nøkkelen og kontrollert
 SHA-256-fingerprint provisioneres med `LH-Ops/scripts/install-release-verifier.sh`.
+Nøkkelmaterialet opprettes med
+`LH-Ops/scripts/generate-release-key-material.sh`, og Actions-secret
+konfigureres med `LH-Ops/scripts/configure-release-signing-secret.sh`. Sistnevnte
+validerer tjeneste, repository, privat/offentlig nøkkel og fingerprint før den
+strømmer secret-verdien til GitHub uten å skrive plaintextnøkkelen til disk.
 
 Skrivbare deploy keys er for øyeblikket deaktivert av organisasjonspolicyen. Ikke bruk et bredt personlig `repo`-token som snarvei. Frem til en repository-avgrenset fine-grained token er konfigurert, bygger og verifiserer release-workflowen hele releasen og laster opp tjenestemappen som et Actions-artifact med syv dagers retention. Kryss-repository-publisering hoppes eksplisitt over.
 
