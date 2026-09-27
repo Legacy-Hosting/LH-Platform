@@ -33,6 +33,8 @@ Hvert tjenesterepository bruker Actions-secret `RELEASES_TOKEN` med minst mulig 
 - Ingen administrasjons-, secrets-, workflow- eller organisasjonstilgang.
 - Tokenet må ha utløpsdato og dokumentert eier.
 
+Skrivbare deploy keys er for øyeblikket deaktivert av organisasjonspolicyen. Ikke bruk et bredt personlig `repo`-token som snarvei. Frem til en repository-avgrenset fine-grained token er konfigurert, bygger og verifiserer release-workflowen hele releasen og laster opp tjenestemappen som et Actions-artifact med syv dagers retention. Kryss-repository-publisering hoppes eksplisitt over.
+
 En tjenesterelease skal bare endre sin egen mappe. Ved samtidig publisering kan et push måtte kjøres på nytt etter rebase; eksisterende artefakter skal aldri force-pushes eller slettes.
 
 ## Felles release gates
@@ -72,6 +74,22 @@ Før en tag opprettes:
 cd LH-Releases/LH-API
 sha256sum --check SHA256/lh-api-X.Y.Z.tar.gz.sha256
 ```
+
+Hvis `RELEASES_TOKEN` mangler, publiseres det verifiserte artifactet kontrollert fra en ren lokal checkout:
+
+```bash
+git -C LH-Releases pull --ff-only origin main
+LH-API/ops/scripts/build-release.sh X.Y.Z LH-Releases
+cd LH-Releases/LH-API
+sha256sum --check SHA256/lh-api-X.Y.Z.tar.gz.sha256
+cd ..
+git lfs install --local
+git add LH-API
+git commit -m "release: LH-API X.Y.Z"
+git push origin main
+```
+
+Erstatt `LH-API` med aktuell tjeneste. Et eksisterende arkiv skal aldri overskrives; publiser en ny patchversjon ved feil.
 
 Bytt tjenestenavn og filnavn etter behov.
 

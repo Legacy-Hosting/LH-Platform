@@ -126,11 +126,12 @@ API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` f
 **Status: `STARTED`**
 
 - [x] Separate CI-løp for API, Panel, Agent, Discord, SSO, Hub og Status.
-- [x] Separate release-workflows som publiserer til `LH-Releases`.
+- [x] Separate release-workflows som publiserer med credential, eller beholder et verifisert 7-dagers Actions-artifact for manuell publisering når credential mangler.
 - [x] Git LFS for `.tar.gz`; checksum-filer ligger som vanlig tekst under `SHA256`.
 - [x] Legge CI- og release-workflows til Hub og Status.
 - [ ] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
 - [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
+- [x] Tagge og publisere første separate release for SSO (`1.2.0`) og Hub (`0.2.0`).
 - [ ] Signere releaseartefakter i tillegg til SHA-256.
 - [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
 - [ ] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
