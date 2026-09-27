@@ -53,18 +53,20 @@ på de nye serverne.
 
 | Tjeneste | Versjon | Verifisert commit |
 | --- | --- | --- |
-| LH-API | `1.2.1` | `dbe91ac` |
-| LH-Panel | `1.0.39` | `2145cd4` |
-| LH-Agent | `1.0.33` | `55c743e` |
-| LH-Discord | `1.3.1` | `78fb15c` |
-| LH-SSO | `1.3.1` | `f329467` |
-| LH-Hub | `0.6.1` | `9d1089d` |
-| LH-Status | `0.4.1` | `28f20ae` |
+| LH-API | `1.2.1` | `2f2eb22` |
+| LH-Panel | `1.0.39` | `25d12a9` |
+| LH-Agent | `1.0.33` | `ea45113` |
+| LH-Discord | `1.3.1` | `22fb736` |
+| LH-SSO | `1.3.1` | `2807a08` |
+| LH-Hub | `0.6.1` | `cb31567` |
+| LH-Status | `0.4.1` | `85b9182` |
 
-Kandidatene er lokalt testet og bygget i rene Node 24/Linux-miljøer med
-midlertidige Ed25519-testnøkler. Checksum, 64-byte signatur og release-manifest
-er verifisert. De er ikke tagget eller publisert; først må CI kunne kjøre grønt,
-og produksjonsnøklene må opprettes og provisioneres etter nøkkelprosedyren.
+Kandidatene er lokalt testet og bygget fra rene commits i Node
+24/Linux-miljøer med midlertidige Ed25519-testnøkler. Checksum, 64-byte signatur
+og release-manifest er verifisert. Release-workflowene krever annotert semver-tag
+på en commit i `main`, samsvarende `package.json` og rent worktree. Kandidatene
+er ikke tagget eller publisert; først må CI kunne kjøre grønt, og
+produksjonsnøklene må opprettes og provisioneres etter nøkkelprosedyren.
 
 ## Tilgang til LH-Releases
 
