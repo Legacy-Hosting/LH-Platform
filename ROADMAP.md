@@ -1,151 +1,164 @@
-# Legacy Hosting Platform Roadmap
+# Legacy Hosting – roadmap
 
-Sist oppdatert: 17.09.2026
+Sist oppdatert: 27.09.2026
 
-Dette dokumentet dekker `LH-Panel`, `LH-API`, `LH-Agent` og den gjenbrukbare `TEMPLATE`-mappen.
+Denne rotmappen er et midlertidig migreringsområde. Hver tjeneste eies, testes, versjoneres og deployes fra sitt eget repository. `LH-Platform` skal fjernes når alle driftsfiler er flyttet og de selvstendige produksjonsdeployene er verifisert.
 
 ## Statusbetydning
 
-- `PLANNED` — arbeidet er ikke startet.
-- `STARTED` — arbeidet er delvis implementert.
-- `FINISHED` — arbeidet er implementert og verifisert lokalt. Produksjonssetting spores separat i fase 9.
+- `PLANNED` – ikke startet.
+- `STARTED` – delvis implementert, men ikke ferdig produksjonsverifisert.
+- `READY` – implementert og verifisert i CI, men kan mangle produksjonsutrulling.
+- `LIVE` – satt i produksjon og kontrollert med health checks.
 
-## Oversikt
+## Målarkitektur
 
-| Fase | Område | Status |
-| --- | --- | --- |
-| 1 | Designsystem og responsivt panelskall | `FINISHED` |
-| 2 | API-, database- og modulgrunnlag | `FINISHED` |
-| 3 | Kontoer, team og sikker innlogging | `FINISHED` |
-| 4 | Cloudflare- og GitHub-integrasjoner | `FINISHED` |
-| 5 | Noder, applikasjoner og deployment | `FINISHED` |
-| 6 | DNS, reverse proxy og TLS | `FINISHED` |
-| 7 | Drift, logger og sanntidsoppdateringer | `FINISHED` |
-| 8 | Overvåking, varsling og ressursgrenser | `FINISHED` |
-| 9 | Produksjonsherding og lansering | `FINISHED` |
-| 10 | Billing og fremtidige API-produkter | `PLANNED` |
+| Repository | Ansvar | Produksjonsplassering | Status |
+| --- | --- | --- | --- |
+| `LH-API` | Kunde-, workspace-, applikasjons-, deployment- og integrasjons-API | `ams3-api-01.legacyh.fyi` | `STARTED` |
+| `LH-Panel` | Kundepanel og plattformadministrasjon | `ams3-panel-01.legacyh.fyi` | `STARTED` |
+| `LH-SSO` | Felles identitet, OIDC, passkeys, sesjoner og staff-roller | `ams3-sso-01.legacyh.fyi` | `STARTED` |
+| `LH-Hub` | Internt driftsdashboard for Legacy Hosting-ansatte | `ams3-hub-01.legacyh.fyi` | `STARTED` |
+| `LH-Status` | Offentlig og uavhengig statusside | `fra1-status-01.legacyh.fyi` | `PLANNED` |
+| `LH-Discord` | Discord-integrasjon og synkronisering av staff-roller | Samme server som `LH-Panel`, egen PM2-prosess | `READY` |
+| `LH-Agent` | Overvåking på alle servere og hostingkommandoer på applikasjonsnoder | Alle relevante servere | `READY` |
+| `LH-Releases` | Immutable releasearkiver og SHA-256-filer | GitHub/LFS, ikke en kjørende tjeneste | `READY` |
+| `LH-Platform` | Gammel samlet orkestrering | Skal ikke deployes videre | `STARTED` utfasing |
 
-## Fase 1 — Designsystem og responsivt panelskall
+API, Panel, SSO og Hub ligger i `default-ams3`. Status ligger i `default-fra1` for å unngå at én regionfeil skjuler driftsstatus. Managed MySQL ligger i AMS3. Bare API og SSO skal ha databasetilgang.
 
-**Status: `FINISHED`**
+## Fase 1 – Repository-splitt og eierskap
 
-- [x] Responsivt panel for desktop, nettbrett og mobil.
-- [x] Fast sidebar, topbar og footer; kun hovedinnholdet ruller.
-- [x] Scrollbar plassert ved høyre kant av nettleservinduet.
-- [x] Footer med panelversjon, Legacy Hosting-lenke og live Europe/Oslo-klokke.
-- [x] Ett hovedstilark: `LH-Panel/src/main.css`.
-- [x] Gjenbrukbart Legacy Hosting-design i `TEMPLATE`.
+**Status: `STARTED`**
 
-## Fase 2 — API-, database- og modulgrunnlag
+- [x] Opprette `LH-Agent`, `LH-API`, `LH-Discord`, `LH-Hub`, `LH-Panel`, `LH-Releases`, `LH-SSO` og `LH-Status`.
+- [x] Flytte aktiv API-, Panel- og Agent-kode til egne repositories.
+- [x] Opprette sentral release-struktur med egen `SHA256`-mappe per tjeneste.
+- [x] Etablere Node.js 24 LTS som runtime-baseline.
+- [ ] Flytte alle nødvendige Nginx-, installasjons-, deploy-, rollback- og backupfiler ut av `LH-Platform`.
+- [ ] Fjerne submodule-avhengigheter og den gamle samlede releaseflyten.
+- [ ] Arkivere og deretter slette `LH-Platform` når slettesjekklisten nederst er fullført.
 
-**Status: `FINISHED`**
+## Fase 2 – API, Panel og hostingplattform
 
-- [x] Felles API laget for flere Legacy Hosting-produkter.
-- [x] Modulstruktur for blant annet `panel/modules` og `billing/modules`.
-- [x] DigitalOcean Managed MySQL 8 som databaseplattform.
-- [x] Migrasjoner for brukere, team, integrasjoner, noder, applikasjoner, deployments og varsler.
-- [x] Team-isolering av data og rollebasert tilgang.
-- [x] Kryptering av lagrede hemmeligheter og audit-logg for viktige handlinger.
+**Status: `STARTED`**
 
-## Fase 3 — Kontoer, team og sikker innlogging
+- [x] Kunde- og workspace-isolering.
+- [x] Cloudflare OAuth og GitHub App user-to-server-autorisasjon.
+- [x] Brukere ser bare repositories de selv har lese- og skrivetilgang til.
+- [x] Flere prosesser per applikasjon, inkludert web, API, worker, custom og bot.
+- [x] Live buildlogger, runtime-logger, kopiering og automatisk loggscrolling.
+- [x] Live statusoppdatering ved deploy, restart og stopp.
+- [x] Redigering og sletting av applikasjoner.
+- [x] Supportvisning av kundens workspace med eksplisitt retur til egen administratorkontekst.
+- [x] Skjule nodeinfrastruktur fra vanlige kunder.
+- [x] Skille mellom `hosting-node` og `monitor-only` i Agent, API og Panel.
+- [ ] Flytte Panel/API-innlogging til LH-SSO uten å bryte eksisterende brukere eller passkeys.
+- [ ] Produksjonssette API og Panel på hver sin nye server.
 
-**Status: `FINISHED`**
+## Fase 3 – Felles identitet med LH-SSO
 
-- [x] Flere brukerkontoer og team/workspaces.
-- [x] Roller, medlemskap og invitasjoner.
-- [x] Registrering kan settes til åpen, kun invitasjon eller stengt.
-- [x] Passkeys/WebAuthn med støtte for Windows Hello.
-- [x] Databasebaserte sesjoner og sikker utlogging.
-- [x] Administrasjon av konto- og sikkerhetsinnstillinger i panelet.
+**Status: `STARTED`**
 
-## Fase 4 — Cloudflare- og GitHub-integrasjoner
+- [x] Opprette separat SSO-database og migreringsløp.
+- [x] Opprette autentisert Discord-rolle-synk med tillatte staff-roller.
+- [ ] Implementere OIDC Authorization Code Flow med PKCE.
+- [ ] Implementere signering, JWKS, nøkkelrotasjon og kortlivede tokens.
+- [ ] Flytte passkeys/WebAuthn og kontogjenoppretting til SSO.
+- [ ] Registrere Panel, Hub og andre tjenester som separate OIDC-klienter.
+- [ ] Migrere eksisterende Panel-brukere, identiteter og aktive sesjoner kontrollert.
+- [ ] Beholde host-only cookies; ikke dele én sesjonscookie på hele domenet.
+- [ ] Legge til logout og session revocation på tvers av tjenester.
+- [ ] Fjerne gammel API-innlogging først etter parallell drift og godkjent rollback-test.
 
-**Status: `FINISHED`**
+## Fase 4 – Ansattportal med LH-Hub
 
-- [x] Cloudflare OAuth per kunde/team med offline-tilgang.
-- [x] Henting av soner og håndtering av proxied CNAME-poster.
-- [x] GitHub App/OAuth for personlige kontoer og organisasjoner.
-- [x] Tilgang til både offentlige og private repositories.
-- [x] Sikker callback-, state- og tokenhåndtering.
-- [x] GitHub-webhooks som starter automatisk deployment ved push.
+**Status: `STARTED`**
 
-## Fase 5 — Noder, applikasjoner og deployment
+- [ ] Kreve LH-SSO og staff-rolle for alle Hub-ruter.
+- [ ] Bruke server-side DigitalOcean API med minst mulige read-only scopes.
+- [ ] Vise CPU, minne, disk, last, båndbredde og health per server.
+- [ ] Samle API-, Agent-, deployment-, database- og statusinformasjon uten å eksponere leverandørtokens til nettleseren.
+- [ ] Støtte rollebaserte visninger for Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
+- [ ] Legge til audit-logg for support- og administrasjonshandlinger.
+- [ ] Holde kunde-, produkt- og Discord-varslingsroller utenfor Hub-autorisasjon.
 
-**Status: `FINISHED`**
-
-- [x] Registrering av noder med offentlig/privat FQDN, separate IPv4- og IPv6-adresser og ønsket CNAME-mål.
-- [x] Agent-token og signerte kommandoer mellom API og node.
-- [x] Opprette, starte, stoppe, restarte og slette PM2-applikasjoner.
-- [x] Lagringssti følger `/home/ROOT.DOMAIN/FULL.HOSTNAME`.
-- [x] Miljøvariabler lagres kryptert og brukes ved oppstart/deployment.
-- [x] Automatisk oppdagelse av npm, pnpm, yarn, bun og vanlige Node.js-rammeverk.
-- [x] Internt styrt port og generering av PM2-konfigurasjon.
-- [x] Flere PM2-prosesser per repository med web-, API-, worker- og custom-prosesser.
-- [x] Transaksjonell, kollisjonssikker auto-tildeling av porter; kunder kan ikke velge eller overstyre `PORT`.
-- [x] Prosesspesifikke arbeidsmapper, kommandoer, miljøvariabler, startrekkefølge og persistente filer/mapper.
-- [x] Deployment-historikk og rollback til tidligere commit.
-
-## Fase 6 — DNS, reverse proxy og TLS
-
-**Status: `FINISHED`**
-
-- [x] Opprette og oppdatere Cloudflare CNAME for applikasjonsdomener.
-- [x] Generere Nginx reverse-proxy-konfigurasjon per applikasjon.
-- [x] Path-basert ruting av flere prosesser på samme hostname og valgfrie hostnames/aliaser på tvers av tilkoblede Cloudflare-soner.
-- [x] TLS-utstedelse med Certbot og Cloudflare DNS-01.
-- [x] Midlertidig credential-fil for Cloudflare-token under sertifikatutstedelse.
-- [x] Automatisk sertifikatfornyelse.
-- [x] Opprydding av PM2-prosess, proxy, sertifikat og applikasjonsfiler ved sletting.
-
-## Fase 7 — Drift, logger og sanntidsoppdateringer
-
-**Status: `FINISHED`**
-
-- [x] Applikasjonsdetaljer, deployments og driftskommandoer i panelet.
-- [x] PM2 stdout/stderr-logger tilgjengelig fra panelet.
-- [x] Agent-polling for nye kommandoer.
-- [x] Live build-output via Server-Sent Events.
-- [x] Mulighet til å avbryte en pågående deployment.
-- [x] Varslingssenter med lest/ulest-status per bruker.
-- [x] Skrivebeskyttet visning av hemmelige miljøverdier etter lagring.
-
-## Fase 8 — Overvåking, varsling og ressursgrenser
-
-**Status: `FINISHED`**
-
-- [x] Agent-heartbeat og nåværende CPU-, minne-, disk- og PM2-status.
-- [x] Grunnleggende node- og applikasjonsstatus i dashboardet.
-- [x] Interne panelvarsler for relevante hendelser.
-- [x] Historiske målinger, dynamisk aggregering, retention og responsive tidsseriegrafer.
-- [x] HTTP health checks, oppetid og responstid per applikasjon.
-- [x] Automatisk deteksjon og recovery-varsling når en node eller applikasjon går ned.
-- [x] CPU-, minne-, lagrings- og månedlige trafikkgrenser med workspace-standard og applikasjonsoverstyring.
-- [x] Panel-, Resend-e-post- og signerte webhook-varsler med konfigurerbare regler og cooldown.
-- [x] Nodeadministrasjon og nodeovervåking er skjult og API-beskyttet for kunder, men tilgjengelig i eget plattformadmin-område.
-
-## Fase 9 — Produksjonsherding og lansering
-
-**Status: `FINISHED`**
-
-- [x] Fullføre enhets-, integrasjons- og ende-til-ende-tester.
-- [x] Legge til CI for lint, test, build og migrasjonskontroll.
-- [x] Gjennomgå rate limiting, CSRF, replay-beskyttelse og nøkkelrotasjon.
-- [x] Definere backup, restore-test, loggretention og beredskapsrutiner.
-- [x] Lage repeterbar installasjon, oppdatering og rollback for API, panel og agent.
-- [x] Produksjonskonfigurere GitHub App, Cloudflare OAuth og alle secrets.
-- [x] Staged utrulling til `ams3.web-01.legacyh.fyi` og verifikasjon mot Managed MySQL 8.
-- [x] Produksjonsgodkjenning, dokumentasjon og første versjonerte release.
-
-## Fase 10 — Billing og fremtidige API-produkter
+## Fase 5 – Offentlig status med LH-Status
 
 **Status: `PLANNED`**
 
-- [ ] Definere planer, abonnementer, kvoter og bruksbasert måling.
+- [ ] Kjøre uavhengig av AMS3, Managed MySQL, API, Panel, Hub og SSO.
+- [ ] Publisere komponentstatus, hendelser og vedlikehold uten interne detaljer.
+- [ ] Kjøre eksterne probes fra FRA1 mot offentlige endepunkter.
+- [ ] Ha separat datalager eller statisk fallback slik at status fortsatt vises ved kontrollplanfeil.
+- [ ] Støtte incidenthistorikk, abonnementsvarsler og RSS/Atom.
+- [ ] Etablere egen varslingsvei som ikke er avhengig av systemet den overvåker.
+
+## Fase 6 – Discord og rollemodell
+
+**Status: `READY`**
+
+- [x] Eget `LH-Discord` repository og egen PM2-prosess.
+- [x] Rolleoppslag basert på immutable Discord role IDs, ikke rollenavn.
+- [x] Synkronisere kun staff-rollene Founder, Management, Administrator, Developer, Infrastructure, Support og Sales.
+- [x] Hindre customer-, product-, notification-, booster-, bot-, member- og muted-roller fra å gi Hub-tilgang.
+- [ ] Koble Discord-identitet til SSO-konto med eksplisitt brukerflyt.
+- [ ] Legge til retry-kø og audit-logg for mislykket synkronisering.
+- [ ] Produksjonssette boten på Panel-serveren.
+
+## Fase 7 – Releases og produksjonsdrift
+
+**Status: `STARTED`**
+
+- [x] Separate CI-løp for API, Panel, Agent, Discord og SSO.
+- [x] Separate release-workflows som publiserer til `LH-Releases`.
+- [x] Git LFS for `.tar.gz`; checksum-filer ligger som vanlig tekst under `SHA256`.
+- [ ] Legge samme workflow til Hub og Status.
+- [ ] Lage selvstendig installer, deploy, health verification og rollback per kjørende tjeneste.
+- [ ] Konfigurere `RELEASES_TOKEN` med kun nødvendig tilgang.
+- [ ] Signere releaseartefakter i tillegg til SHA-256.
+- [ ] Verifisere restore og rollback på en ren Ubuntu 26.04 LTS-server.
+- [ ] Tagge og publisere første separate produksjonsrelease for hver tjeneste.
+
+## Fase 8 – Backup, observability og kapasitet
+
+**Status: `STARTED`**
+
+- [x] Managed MySQL automatiske backups/PITR som primærlag.
+- [x] Agent-heartbeats og applikasjonsmålinger.
+- [ ] Separate krypterte logiske backups av API- og SSO-databasene.
+- [ ] Kvartalsvise restore-drills for begge databasene.
+- [ ] Installere og kontrollere DigitalOcean Monitoring Agent på alle Droplets.
+- [ ] Aggregere DigitalOcean Insights i Hub via read-only API-token.
+- [ ] Definere backup for kundens persistente filer på hostingnoder.
+- [ ] Fastsette retention, RPO og RTO per datakategori.
+- [ ] Lastteste API, SSO og database før kundevekst.
+
+## Fase 9 – Billing og produktstyring
+
+**Status: `PLANNED`**
+
+- [ ] Definere produkter, planer, kvoter og abonnementer.
 - [ ] Integrere betalingsleverandør, fakturaer og betalingsstatus.
-- [ ] Koble ressursgrenser og applikasjonstilgang til kundens plan.
-- [ ] Utvide `billing/modules` uten å blande billing-logikk inn i panelmodulene.
-- [ ] Lage versjonert API-dokumentasjon for fremtidige Legacy Hosting-prosjekter.
+- [ ] Koble ressursgrenser og hostingtilgang til kundens plan.
+- [ ] Holde billing-logikk adskilt fra deployment- og identitetslogikk.
 
-## Neste anbefalte arbeid
+## Rekkefølge videre
 
-Start fase 10 med planer, kvoter og billing uten å blande faktureringslogikk inn i panelmodulene.
+1. Fullfør Hub- og Status-grunnlag med CI og releaseworkflow.
+2. Flytt driftsfiler fra `LH-Platform` til riktig tjenesterepository.
+3. Implementer og test full OIDC/PKCE i SSO.
+4. Migrer Panel og API til SSO med parallell drift og rollbackmulighet.
+5. Produksjonssett API, Panel, SSO, Hub, Status og Discord én tjeneste om gangen.
+6. Kjør backup-, restore-, failover- og sikkerhetstest.
+7. Arkiver nødvendige historiske referanser og slett `LH-Platform`.
+
+## Sjekkliste før LH-Platform slettes
+
+- [ ] Ingen produksjonsworkflow leser filer fra roten.
+- [ ] Alle kjørende tjenester kan bygges fra en ren klone av eget repository.
+- [ ] Hver tjeneste kan deployes og rulles tilbake uten submodules.
+- [ ] Backup- og restore-skript eies av API/SSO eller et eksplisitt ops-repository.
+- [ ] Nginx- og systemd-filer ligger hos tjenesten som bruker dem.
+- [ ] Siste samlede release er beholdt som historisk artefakt, ikke som aktiv deploykilde.
+- [ ] Alle secrets er rotert etter utfasing av gammel server og workflow.

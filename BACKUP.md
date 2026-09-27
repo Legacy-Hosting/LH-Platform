@@ -1,22 +1,105 @@
-# Backup and recovery
+# Backup og gjenoppretting
 
-DigitalOcean Managed MySQL automated backups and point-in-time recovery are the primary database recovery layer. A daily encrypted logical export provides an independent recovery path.
+DigitalOcean Managed MySQL sine automatiske backups og point-in-time recovery (PITR) er primær gjenopprettingsmekanisme. Krypterte logiske eksporter gir en uavhengig kopi og brukes også til restore-drills.
 
-`configure-production.sh` generates the age identity and writes the protected backup environment without exposing passwords in shell history.
+## Datakategorier
 
-## Logical backup
+| Data | Eier | Primær backup | Uavhengig kopi |
+| --- | --- | --- | --- |
+| Kunder, workspaces, applikasjoner, deployments og integrasjoner | `LH-API`-database | Managed MySQL PITR | Daglig kryptert logical dump |
+| Identiteter, passkeys, OIDC grants, sesjoner og staff-roller | `LH-SSO`-database | Managed MySQL PITR | Daglig kryptert logical dump |
+| Kundens persistente applikasjonsfiler | Hostingnode/LH-Agent | Skal defineres per produkt | Kryptert objektlagring i annen feilregion |
+| Releaseartefakter | `LH-Releases` | GitHub + Git LFS | Periodisk verifisert speil/eksport |
+| Kildekode og konfigurasjonsmaler | Hvert tjenesterepository | GitHub | Organisasjonsbackup/eksport |
+| Produksjonssecrets | Beskyttet server/secret store | Kontrollert secret-backup | Offline recovery-sett med separat tilgang |
+| Statushendelser | `LH-Status` | Eget statuslager | Eksport uavhengig av AMS3 |
 
-Configure `/etc/legacy-hosting/backup.env` with mode `0600`. Use a read-only backup user where possible and set an `age` recipient. Run `ops/scripts/backup-mysql.sh` daily from systemd or cron. The script writes only encrypted `.sql.gz.age` files and SHA-256 checksums under `/var/backups/legacy-hosting/mysql`.
+GitHub er ikke backup for database, kundedata eller server-secrets. `LH-Releases` inneholder kun deploybare artefakter og checksums.
 
-Copy encrypted backups to a separate account or region. Local retention defaults to 14 days. Provider retention and off-site retention must be documented before launch.
+## Databaseisolering
 
-## Restore drill
+API og SSO skal bruke separate databaser og separate databasebrukere på samme Managed MySQL-cluster. En restore av én tjeneste skal ikke kreve overskriving av den andre.
 
-Run `ops/scripts/restore-drill.sh BACKUP` against a disposable database name beginning with `lh_restore_drill_`. The drill verifies decryption, schema import, and the migration ledger, then removes only that explicitly named drill database.
+Bare `ams3-api-01` og `ams3-sso-01` skal være trusted database sources. Backupjobber som trenger direkte DB-tilgang må kjøre på en av disse eller fra en eksplisitt, tidsbegrenset trusted source.
 
-Perform a restore drill before the first launch and at least quarterly. Record duration, backup timestamp, migration count, and any errors.
+## Daglig logical backup
 
-## Recovery objectives
+For hver database:
 
-- Target RPO: DigitalOcean PITR window or 24 hours for independent logical exports.
-- Target RTO: 60 minutes after database credentials and a clean application release are available.
+1. Bruk en egen backupbruker med minst nødvendige leserettigheter.
+2. Koble med verifisert TLS og DigitalOcean CA.
+3. Ta konsistent dump med routines/events bare dersom tjenesten faktisk bruker dem.
+4. Komprimer før kryptering.
+5. Krypter med `age` til en mottakernøkkel som ikke ligger på samme server som backupen.
+6. Lag SHA-256-checksum av den krypterte filen.
+7. Kopier til en separat konto eller region.
+8. Verifiser opplasting og slett plaintext/midlertidige filer.
+
+Anbefalt filnavn:
+
+```text
+lh-api-db-YYYY-MM-DDTHHMMSSZ.sql.gz.age
+lh-sso-db-YYYY-MM-DDTHHMMSSZ.sql.gz.age
+```
+
+Lokal retention er 14 dager. Off-site retention starter med 35 daglige, 12 månedlige og 3 årlige kopier, og justeres når juridiske og kommersielle krav er fastsatt.
+
+## Persistente applikasjonsfiler
+
+`file:`- og `directory:`-stier i hostingplattformen overlever deploy, men er ikke automatisk off-site backup. Før produktet selges med backupgaranti må følgende være implementert:
+
+- eksplisitt opt-in eller planstyrt backup per applikasjon;
+- allowlist av persistente stier;
+- snapshots uten å følge symlinks utenfor applikasjonsroten;
+- kryptert objektlagring i annen region;
+- retention og kundestyrt restorepunkt;
+- restore til staging før overskriving av live data;
+- audit-logg for opprettelse, sletting og restore.
+
+Databasefiler, sockets, caches, `node_modules` og midlertidige deploymapper skal ekskluderes som standard.
+
+## Restore-drill for API og SSO
+
+Restore kjøres mot en disponibel database med tydelig navn, for eksempel `lh_api_restore_drill_YYYYMMDD` eller `lh_sso_restore_drill_YYYYMMDD`.
+
+1. Velg en backup og kontroller checksum før dekryptering.
+2. Opprett en tom drilldatabase og en tidsbegrenset restorebruker.
+3. Dekrypter og importer uten å eksponere dumpen i shell history eller logger.
+4. Kontroller tabeller, row counts, referanseintegritet og migreringsledger.
+5. Start riktig tjeneste mot drilldatabasen i isolert miljø.
+6. Test minst én kritisk leseflyt og én sikker skriveflyt.
+7. Dokumenter backupens alder, varighet, datatap og feil.
+8. Slett bare den eksakte, validerte drilldatabasen og fjern midlertidig tilgang.
+
+Restore-drill gjennomføres før første produksjonssetting og deretter minst kvartalsvis for begge databaser. SSO-restore skal i tillegg teste token-/session-invalidering og at gamle signeringsnøkler håndteres som planlagt.
+
+## Full gjenopprettingsrekkefølge
+
+1. Opprett nettverk, brannmur, DNS-only origin records og Cloudflare Full (strict).
+2. Gjenopprett Managed MySQL eller velg PITR-tidspunkt.
+3. Gjenopprett SSO-database og start SSO.
+4. Gjenopprett API-database og start API/arbeidere.
+5. Deploy Panel og verifiser innlogging.
+6. Start Hub etter at SSO og API er verifisert.
+7. Start Discord og kjør kontrollert rolle-resync.
+8. Re-enroller eller verifiser Agent på hver server med korrekt mode.
+9. Gjenopprett eventuelle kundedata på hostingnoder.
+10. Hold LH-Status tilgjengelig gjennom hele hendelsen fra FRA1.
+
+## Recoverymål
+
+- API-database: mål-RPO opptil 15 minutter med PITR, maks 24 timer via logical backup; mål-RTO 60 minutter.
+- SSO-database: mål-RPO opptil 15 minutter med PITR; mål-RTO 60 minutter.
+- Releaseartefakter: mål-RPO 0 etter vellykket publisering; mål-RTO 30 minutter fra speil eller rebuild av verifisert tag.
+- Persistente kundefiler: RPO/RTO er ikke lovet før backupfunksjonen er implementert og produktvilkårene er oppdatert.
+- Status: mål-RTO 15 minutter fra statisk fallback eller separat FRA1-deploy.
+
+## Ansvar og varsling
+
+- Infrastructure eier automatisering, retention og restore-drills.
+- Developer eier migreringskompatibilitet og applikasjonsverifisering.
+- Management godkjenner RPO/RTO og retentionkrav.
+- Alle restore-operasjoner og sletting av backups logges og krever navngitt operatør.
+- Mislykket backup, manglende off-site kopi eller utløpt restore-drill skal varsles som en driftsfeil.
+
+De eksisterende backup-skriptene i `LH-Platform/ops` er midlertidige. De må flyttes til riktig repository eller et eksplisitt ops-repository og verifiseres der før `LH-Platform` slettes.

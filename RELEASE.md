@@ -1,32 +1,124 @@
-# Release and incident runbook
+# Release- og utrullingsrunbook
 
-## Release gates
+Hver tjeneste har sitt eget repository, sin egen semantiske versjon og sin egen release. Det finnes ikke lenger én samlet `legacy-hosting-X.Y.Z`-release, og `LH-Platform` skal ikke tagges med nye produksjonsreleaser.
 
-1. CI must pass API tests, migration validation, typechecking, all builds, dependency audits, and responsive Playwright tests.
-2. Create an annotated `vX.Y.Z` tag. The release workflow creates a checksummed immutable archive.
-3. Verify the server SSH host fingerprint through the DigitalOcean console before accepting a changed key.
-4. Copy the archive and checksum to `/opt/legacy-hosting/incoming`.
-5. On the first installation, run `ops/scripts/configure-production.sh` interactively on the server. Never paste secrets into chat or commit them.
-6. Run `ops/scripts/validate-production-env.sh /etc/legacy-hosting/api.env /etc/legacy-hosting/agent.env api-only`, then create an encrypted database backup.
-7. Run `ops/scripts/deploy-release.sh ARCHIVE CHECKSUM VERSION`. The first deployment starts API and panel without an unenrolled agent.
-8. Register the initial Windows Hello account with the protected bootstrap token, then remove the bootstrap-token file and `INITIAL_ADMIN_TOKEN` from `api.env`.
-9. Create the node in the panel and run its **Auto deploy** command on the intended Ubuntu server. `configure-agent.sh` plus `activate-agent.sh` remains the manual fallback.
-10. Verify API health, PM2 state, panel HTTPS, WebAuthn login, one health check, and one signed agent heartbeat.
-11. Set `ALLOW_LEGACY_AGENT_SIGNATURES=false` after all agents are on v1.
+## Artefaktstruktur
 
-For a local release candidate after all builds pass, run `ops/scripts/build-release.sh X.Y.Z`. The script uses the same archive layout as GitHub Actions.
+En tag `vX.Y.Z` i et tjenesterepository skal publisere følgende til `LH-Releases`:
 
-When publishing from the multi-repository workspace, push `LH-API`, `LH-Agent`, and `LH-Panel` branches and tags first. Then push the platform repository's updated submodule references. Private components require the fine-grained read-only `SUBMODULE_TOKEN` documented in the root README.
+```text
+LH-Releases/
+  LH-API/
+    lh-api-X.Y.Z.tar.gz
+    SHA256/
+      lh-api-X.Y.Z.tar.gz.sha256
+  LH-Agent/
+    lh-agent-X.Y.Z.tar.gz
+    SHA256/
+      lh-agent-X.Y.Z.tar.gz.sha256
+  LH-Discord/
+  LH-Hub/
+  LH-Panel/
+  LH-SSO/
+  LH-Status/
+```
+
+`.tar.gz` lagres med Git LFS. `.tar.gz.sha256` lagres som vanlig tekst. Publiserte versjoner er append-only og må aldri overskrives. Hvis en release er feil, publiseres en ny versjon.
+
+## Tilgang til LH-Releases
+
+Hvert tjenesterepository bruker Actions-secret `RELEASES_TOKEN` med minst mulig tilgang:
+
+- Contents: Read and write kun for `Legacy-Hosting/LH-Releases`.
+- Ingen administrasjons-, secrets-, workflow- eller organisasjonstilgang.
+- Tokenet må ha utløpsdato og dokumentert eier.
+
+En tjenesterelease skal bare endre sin egen mappe. Ved samtidig publisering kan et push måtte kjøres på nytt etter rebase; eksisterende artefakter skal aldri force-pushes eller slettes.
+
+## Felles release gates
+
+Før en tag opprettes:
+
+1. Working tree skal være rent og `main` skal være synkronisert med origin.
+2. Tjenestens CI skal være grønn på den eksakte committen.
+3. Versjonen i `package.json` og eventuell runtime-versjonsfil skal stemme med taggen.
+4. Dependency audit skal ikke ha kjente `high` eller `critical` produksjonssårbarheter.
+5. Release-scriptet skal ha bestått shell-syntakskontroll.
+6. Databaseendringer skal være additive og bakoverkompatible med forrige applikasjonsrelease.
+7. Ingen `.env`, tokens, private nøkler, database-CA eller kundedata skal ligge i arkivet.
+
+## Tjenestespesifikke porter
+
+- `LH-API`: migrasjoner mot ren MySQL 8, integrasjonstester, typecheck og build.
+- `LH-Panel`: produksjonsbuild og Playwright på desktop og mobil.
+- `LH-Agent`: enhetstester, typecheck, build og test av både `hosting-node` og `monitor-only`.
+- `LH-SSO`: migrasjoner mot ren MySQL 8, sikkerhetstester, token-/OIDC-tester og build.
+- `LH-Hub`: autentisering/autorisasjon, mockede DigitalOcean-responser, build og UI-test.
+- `LH-Status`: probe-, incident- og fallbacktester samt produksjonsbuild.
+- `LH-Discord`: rolle-ID-policy, SSO-kontrakt, typecheck og build.
+
+## Opprette en release
+
+1. Oppdater versjon og changelog i tjenesterepositoryet.
+2. Kjør alle lokale tester og bygg.
+3. Commit og push til `main`.
+4. Vent til CI er grønn.
+5. Opprett annotert tag `vX.Y.Z` på den verifiserte committen og push taggen.
+6. Release-workflowen bygger på nytt og committer arkiv/checksum til riktig mappe i `LH-Releases`.
+7. Kontroller at arkivet er et LFS-objekt og at checksum-filen peker på riktig filnavn.
+8. Verifiser lokalt med:
+
+```bash
+cd LH-Releases/LH-API
+sha256sum --check SHA256/lh-api-X.Y.Z.tar.gz.sha256
+```
+
+Bytt tjenestenavn og filnavn etter behov.
+
+## Produksjonsplassering
+
+| Tjeneste | Server | Offentlig endepunkt |
+| --- | --- | --- |
+| API | `ams3-api-01.legacyh.fyi` | `api.legacyhosting.xyz` |
+| Panel | `ams3-panel-01.legacyh.fyi` | `panel.legacyhosting.xyz` |
+| SSO | `ams3-sso-01.legacyh.fyi` | `auth.legacyhosting.xyz` |
+| Hub | `ams3-hub-01.legacyh.fyi` | `hub.legacyhosting.xyz` |
+| Status | `fra1-status-01.legacyh.fyi` | `status.legacyhosting.xyz` |
+| Discord | Panel-serveren | Ingen offentlig HTTP-tjeneste |
+
+Origin-DNS skal være DNS-only, mens offentlige CNAME-er kan være proxied. Cloudflare SSL/TLS skal stå i `Full (strict)`.
+
+## Utrulling
+
+Inntil alle repositories har ferdige deploy-skript, gjøres produksjonsutrulling kontrollert og én tjeneste om gangen:
+
+1. Last ned arkiv og checksum fra `LH-Releases`.
+2. Verifiser SHA-256 før utpakking.
+3. Pakk ut til en ny versjonert mappe under `/opt/legacy-hosting/<service>/releases/X.Y.Z`.
+4. Installer kun låste produksjonsavhengigheter.
+5. Koble inn tjenestens beskyttede miljøfil fra `/etc/legacy-hosting/<service>.env`.
+6. For API/SSO: ta backup, kjør migrasjoner, og verifiser migreringsledger før prosessen byttes.
+7. Bytt en atomisk `current`-symlink.
+8. Reload riktig PM2-prosess eller Nginx-konfigurasjon.
+9. Verifiser lokalt health-endepunkt før ekstern trafikk godtas.
+10. Verifiser ekstern HTTPS, Cloudflare og én kritisk brukerflyt.
+11. Kontroller Agent-heartbeat og Hub/Status etter utrullingen.
+
+Panel er en statisk build og skal serveres direkte av Nginx. API, SSO, Hub-backend og Discord kjører som separate prosesser. `LH-Agent` kjører i `monitor-only` på kontrollplanserverne og i `hosting-node` kun på servere som kan utføre kundedeployments.
 
 ## Rollback
 
-Run `ops/scripts/rollback-release.sh VERSION`. Releases use additive, forward-compatible migrations; application rollback never reverses database migrations automatically. Restore a database only for confirmed data corruption and follow `BACKUP.md`.
+- Rull tilbake bare den berørte tjenesten til forrige verifiserte arkiv.
+- Endre `current` tilbake til forrige versjon og restart/reload tjenesten.
+- Database-migrasjoner rulles ikke automatisk tilbake. De skal være forward-compatible med minst én tidligere applikasjonsversjon.
+- Ved bekreftet datakorrupsjon følges `BACKUP.md`; kode-rollback er ikke en database-restore.
+- Ved SSO-feil skal eksisterende Panel-innlogging beholdes som kontrollert fallback frem til SSO-migreringen er godkjent.
 
-## Incident response
+## Hendelse under release
 
-1. Record the start time, affected teams, request IDs, and current release.
-2. Contain: disable registration, revoke exposed tokens/sessions, or drain the affected node.
-3. Preserve PM2, Nginx, API, audit, and database logs before restarting services.
-4. Roll back application code if the incident began with a release.
-5. Recover data only from a verified encrypted backup or DigitalOcean point-in-time recovery.
-6. Document root cause, customer impact, remediation, and follow-up owners.
+1. Stopp videre utrulling.
+2. Registrer tidspunkt, tjenesteversjon, commit, request IDs og påvirkede brukere.
+3. Bevar PM2-, Nginx-, audit- og migreringslogger før restart.
+4. Roll tilbake den berørte tjenesten hvis health eller kritisk flyt feiler.
+5. Oppdater LH-Status via en uavhengig kanal dersom kunder er påvirket.
+6. Opprett ny patchrelease; et publisert artefakt skal aldri erstattes.
